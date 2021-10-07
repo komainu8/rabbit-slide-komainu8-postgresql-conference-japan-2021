@@ -1,0 +1,154 @@
+= PGroongaを使って\n全文検索結果を\nより良くする方法
+
+ : author
+    堀本 泰弘
+ : institution
+    株式会社クリアコード
+ : content-source
+    PostgreSQL Conference Japan 2021
+ : date
+    2021-11-12
+ : allotted-time
+    45m
+ : start-time
+    2021-11-12T16:10:00+09:00
+ : end-time
+    2021-11-12T16:55:00+09:00
+ : theme
+    .
+
+= 自己紹介
+
+  # image
+  # src = images/self-introduction.png
+  # relative_height = 107
+
+= 今日のテーマ
+
+PGroongaの機能を使って\n検索結果を((*より良く*))しよう！
+
+= 今日のテーマ
+
+...の前に
+
+= PGroongaとは？
+
+PGroonga?\n
+(ぴーじーるんが)
+
+= PGroongaとは？
+
+PostgreSQLで\n((*高速・高機能な*))全文検索を実現\nする拡張
+
+= PGroongaの特徴
+
+(1) ((*簡単*))に使える
+(2) ((*速い*))
+(3) ((*高機能*))
+
+= 今日のテーマ
+
+今日は特に\n
+((*高機能*))\n
+に注目します！
+
+= 全文検索結果
+
+PGroongaを使って、検索は速くなった、検索結果もそれなりに良い
+
+= 全文検索
+
+でも、特定の状況下では、検索結果がいまいち
+
+= 検索結果の良し悪し
+
+そもそも、検索結果の良い/悪いとはどういうことか？
+
+= 適合率と再現率
+
+一般的な検索結果の評価は適合率と再現率で評価される
+
+= 適合率？
+
+検索結果の中でどれだけ正解が含まれるか。
+
+= 再現率？
+
+正解の中からどれだけ検索にヒットするか。
+
+= 適合率と再現率
+
+適合率と再現率はトレードオフ
+
+= ランキング
+
+適合率、再現率も大事だが、検索結果の表示順も大事
+
+= ランキング
+
+なぜ？
+
+= ランキング
+
+通常ユーザーは上位数件しか見ない。
+
+= ランキング
+
+ユーザーがすごくほしい情報がヒットしていても、その情報が結果の100件目に現れていたらユーザーの目に止まらない。
+
+= ランキング
+
+ユーザーがほしそうな情報を上位に持ってこれるかも大事
+
+= PGroongaで検索結果の改善
+
+PGroongaの機能で適合率、再現率、ランキングを改良する！
+
+= ノーマライザー
+
+PGroongaは、ノーマライザーをカスタマイズできる。
+オプションをつけることで様々な種類の文字を同一視できる。
+
+= ノーマライザー
+
+具体的には...
+
+= トークナイザー
+
+= ステミング
+
+= ストップワード
+
+= 同義語展開
+
+= 読みがな検索
+
+= fuzzy検索
+
+= スコアリング
+
+= まとめ
+
+PGroongaを使って、検索結果を改善できました！
+
+= 参考資料
+
+= 参考
+
+* PGroonga自体の解説
+
+  * ((<URL:https://www.slideshare.net/kou/postgresql-conference-japan-2017>))
+
+= 参考
+
+* PHPのマニュアル検索
+  * ((<URL:https://www.slideshare.net/kou/phpconference2017>))
+
+* Redmineのチケットを検索
+  * ((<URL:https://www.slideshare.net/kou/redminetokyo12>))
+  * ((<URL:https://github.com/clear-code/redmine_full_text_search>))
+
+= 参考
+
+* AWSでPGroongaを使う
+  * ((<URL:https://slide.rabbit-shocker.org/authors/komainu8/postgresql-conference-japan-2019/>))
