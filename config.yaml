@@ -1,0 +1,31 @@
+---
+id: postgresql-conference-japan-2021
+base_name: improve-search-result-with-pgroonga
+tags: [
+  rabbit,
+  postgresql,
+  pgcon21j,
+  fts,
+  search,
+  pgroonga,
+  groonga
+]
+presentation_date: 2021-11-12
+presentation_start_time: 2021-11-12T16:10:00+09:00
+presentation_end_time: 2021-11-12T17:00:00+09:00
+version: 1.0.0
+licenses: [
+  CC-BY-SA-4.0
+]
+slideshare_id:
+speaker_deck_id:
+ustream_id:
+vimeo_id:
+youtube_id:
+author:
+  markup_language: :rd
+  name: Horimoto Yasuhiro
+  email: horimoto@clear-code.com
+  rubygems_user: komainu8
+  slideshare_user:
+  speaker_deck_user:
