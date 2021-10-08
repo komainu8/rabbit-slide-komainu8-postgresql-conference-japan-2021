@@ -295,7 +295,111 @@ Complate!
 
 = トークナイザー
 
+次は、トークナイザー
+
 = トークナイザー
+
+何ができるのか？
+
+= トークナイザー
+
+全文検索では、データをトークンという単位に区切る
+
+= トークナイザー
+
+例えば、
+
+This is a pen
+-> Th / hi / is / s  /  i / is / s  /  a / a  /  p / pe / en / n
+
+= トークナイザー
+
+これはペンです
+-> これ / れは / はペ / ペン / ンで / です / す
+= トークナイザー
+
+検索キーワードも同様にトークンに区切る。
+
+= トークナイザー
+
+検索キーワード:pen
+pen -> pe / en / n
+
+= トークナイザー
+
+データの中に pe / en / n がこの順序ででてくるデータを取得する。
+
+= トークナイザー
+
+トークナイザーによって、適合率も再現率も変わる。
+
+= トークナイザー
+
+適合率を上げてみる
+
+= トークナイザー
+
+  # coderay sql
+
+    CREATE TABLE tokenizer_test (
+      title text
+    );
+    CREATE INDEX pgroonga_content_index ON tokenizer_test USING pgroonga (title);
+
+    INSERT INTO tokenizer_test VALUES ('京都府 1日目 金閣寺');
+    INSERT INTO tokenizer_test VALUES ('京都府 2日目 嵐山');
+    INSERT INTO tokenizer_test VALUES ('京都府 3日目 天橋立');
+    INSERT INTO tokenizer_test VALUES ('東京都 1日目 スカイツリー');
+    INSERT INTO tokenizer_test VALUES ('東京都 2日目 浅草寺');
+    INSERT INTO tokenizer_test VALUES ('北海道 1日目 函館');
+    INSERT INTO tokenizer_test VALUES ('北海道 2日目 トマム');
+    INSERT INTO tokenizer_test VALUES ('北海道 3日目 富良野');
+    INSERT INTO tokenizer_test VALUES ('北海道 4日目 美瑛');
+    INSERT INTO tokenizer_test VALUES ('北海道 5日目 旭川');
+
+    SELECT * FROM tokenizer_test WHERE title &@ '京都';
+
+= トークナイザー
+
+結果
+
+= トークナイザー
+
+  # coderay sql
+
+                    title                 
+    --------------------------------------
+     京都府 1日目 金閣寺
+     京都府 2日目 嵐山
+     京都府 3日目 天橋立
+     東京都 1日目 スカイツリー
+     東京都 2日目 浅草寺
+    (5 rows)
+
+= トークナイザー
+
+"東京都"がヒットする。。。
+
+= トークナイザー
+
+なぜ？
+
+= トークナイザー
+
+東京都 -> 東京 / ((*京都*)) / 都
+京都府 -> 京都 / 都府 / 府
+
+= トークナイザー
+
+再現率を上げる
+
+= トークナイザー
+
+トークナイザーを変える
+
+= トークナイザー
+
+トークナイザーを変える
 
 = ステミング
 
