@@ -108,14 +108,192 @@ PGroongaを使って、検索は速くなった、検索結果もそれなりに
 
 PGroongaの機能で適合率、再現率、ランキングを改良する！
 
+= 適合率と再現率の改良
+
+ノーマライザー
+
 = ノーマライザー
 
-PGroongaは、ノーマライザーをカスタマイズできる。
-オプションをつけることで様々な種類の文字を同一視できる。
+何ができるのか？
 
 = ノーマライザー
 
-具体的には...
+同一視
+
+= ノーマライザー
+
+例えば、
+
+* "㌕"と"キログラム"
+* "きろぐらむ"と"キログラム"
+* "ｷﾛｸﾞﾗﾑ"と"キログラム"
+
+= ノーマライザー
+
+"キログラム"で"㌕"も"きろぐらむ"も"ｷﾛｸﾞﾗﾑ"もヒットしてほしい！
+
+= ノーマライザー
+
+ノーマライザーを使うことで、
+"キログラム"で"㌕"も"きろぐらむ"も"ｷﾛｸﾞﾗﾑ"もヒットする。
+
+= ノーマライザー
+
+以下を全部同じものとして扱う(同一視する)から
+
+* "キログラム"
+* "㌕"
+* "きろぐらむ"
+* "ｷﾛｸﾞﾗﾑ"
+
+= ノーマライザー
+
+PGroongaはどうなっているのか？
+
+= ノーマライザー
+
+  # coderay sql
+
+    CREATE DATABASE pgroonga_test;
+    CREATE EXTENSION pgroonga;
+    CREATE TABLE normalizer_test (
+      id integer,
+      content text
+    );
+    CREATE INDEX pgroonga_content_index ON normalizer_test USING pgroonga (content);
+
+    INSERT INTO normalizer_test VALUES (1, 'キログラム');
+    INSERT INTO normalizer_test VALUES (2, 'きろぐらむ');
+    INSERT INTO normalizer_test VALUES (3, '㌕');
+    INSERT INTO normalizer_test VALUES (4, 'ｷﾛｸﾞﾗﾑ');
+    INSERT INTO normalizer_test VALUES (5, 'kiroguramu');
+    INSERT INTO normalizer_test VALUES (6, 'ｋｉｒｏｇｕｒａｍｕ');
+
+    SELECT * FROM normalizer_test WHERE content &@ 'キログラム';
+
+= ノーマライザー
+
+結果
+
+= ノーマライザー
+
+  # coderay sql
+
+     id |      content       
+    ----+--------------------
+      1 | キログラム
+      3 | ㌕
+      4 | ｷﾛｸﾞﾗﾑ
+    (3 rows)
+
+= ノーマライザー
+
+デフォルトだと
+
+* 半角/全角を同一視
+* ㌕とキログラムを同一視
+
+= ノーマライザー
+
+再現率を上げたい
+
+= ノーマライザー
+
+ノーマライザーを変えてみる
+
+= ノーマライザー
+
+  # coderay sql
+
+    CREATE INDEX pgroonga_content_index
+              ON normalizer_test
+           USING pgroonga (content)
+            WITH (normalizers='NormalizerNFKC130');
+
+= ノーマライザー
+
+結果
+
+= ノーマライザー
+
+  # coderay sql
+
+     id |      content       
+    ----+--------------------
+      1 | キログラム
+      3 | ㌕
+      4 | ｷﾛｸﾞﾗﾑ
+    (3 rows)
+
+= ノーマライザー
+
+変わらない。。。
+
+= ノーマライザー
+
+NormalizerNFKC130のオプションをつかってみる
+
+= ノーマライザー
+
+  # coderay sql
+
+    CREATE INDEX pgroonga_content_index
+              ON normalizer_test
+           USING pgroonga (content)
+            WITH (normalizers='NormalizerNFKC130("unify_kana", true)');
+
+= ノーマライザー
+
+結果
+
+= ノーマライザー
+
+  # coderay sql
+
+     id |      content       
+    ----+--------------------
+      1 | キログラム
+      2 | きろぐらむ
+      3 | ㌕
+      4 | ｷﾛｸﾞﾗﾑ
+    (4 rows)
+
+= ノーマライザー
+
+再現率が上がった。
+
+= ノーマライザー
+
+  # coderay sql
+
+    CREATE INDEX pgroonga_content_index
+              ON normalizer_test
+           USING pgroonga (content)
+            WITH (normalizers='NormalizerNFKC130("unify_kana", true,
+                                                 "unify_to_romaji", true)');
+
+= ノーマライザー
+
+結果
+
+= ノーマライザー
+
+  # coderay sql
+
+    id |            content             
+   ----+--------------------------------
+     1 | キログラム
+     2 | きろぐらむ
+     3 | ㌕
+     4 | ｷﾛｸﾞﾗﾑ
+     5 | kiroguramu
+     6 | ｋｉｒｏｇｕｒａｍｕ
+
+= ノーマライザー
+
+Complate!
+
+= トークナイザー
 
 = トークナイザー
 
