@@ -148,7 +148,7 @@ PGroongaの機能で適合率、再現率、ランキングを改良する！
 
 = ノーマライザー
 
-PGroongaはどうなっているのか？
+PGroongaではどうするのか？
 
 = ノーマライザー
 
@@ -195,6 +195,14 @@ PGroongaはどうなっているのか？
 
 = ノーマライザー
 
+なので、以下はヒットしない。
+
+* 'きろぐらむ'
+* 'kiroguramu'
+* 'ｋｉｒｏｇｕｒａｍｕ'
+
+= ノーマライザー
+
 再現率を上げたい
 
 = ノーマライザー
@@ -231,7 +239,11 @@ PGroongaはどうなっているのか？
 
 = ノーマライザー
 
-NormalizerNFKC130のオプションをつかってみる
+デフォルトのNormalizerAutoもNFKCを使うから
+
+= ノーマライザー
+
+ただ、NormalizerNFKC130はオプションをつかって挙動を変更できる
 
 = ノーマライザー
 
@@ -260,7 +272,7 @@ NormalizerNFKC130のオプションをつかってみる
 
 = ノーマライザー
 
-再現率が上がった。
+新たに、 'きろぐらむ' がヒット
 
 = ノーマライザー
 
@@ -292,6 +304,34 @@ NormalizerNFKC130のオプションをつかってみる
 = ノーマライザー
 
 Complate!
+
+= ノーマライザー
+
+何をしたのか？
+
+= ノーマライザー
+
+ポイントは以下のオプション
+
+* unify_kana
+* Unify_to_romaji
+
+= ノーマライザー
+
+* unify_kana
+
+ひらがなとカタカナを同一視。
+「あ」と「ア」が同じものとして扱われる。
+
+= ノーマライザー
+
+なので、「キログラム」で「」
+ひらがなとカタカナを同一視。
+「あ」と「ア」が同じものとして扱われる。
+
+= ノーマライザー
+
+* Unify_to_romaji
 
 = トークナイザー
 
@@ -395,23 +435,214 @@ pen -> pe / en / n
 
 = トークナイザー
 
-トークナイザーを変える
+東京都のレコードはノイズなのでヒットしてほしくない
 
 = トークナイザー
 
 トークナイザーを変える
 
+= トークナイザー
+
+  # coderay sql
+
+    CREATE INDEX pgroonga_content_index ON tokenizer_test USING pgroonga (title) WITH (tokenizer='TokenMecab');
+
+= トークナイザー
+
+結果
+
+= トークナイザー
+
+        title        
+---------------------
+ 京都府 1日目 金閣寺
+ 京都府 2日目 嵐山
+ 京都府 3日目 天橋立
+(3 rows)
+
 = ステミング
+
+語形変化
+
+= ステミング
+
+意味は同じで形が変わるもの。
+
+名詞の語形変化は曲用
+動詞の語形変化は活用
+
+= ステミング
+
+例えば
+
+develop, developped, developing
+
+のように、原形、過去形、進行形と意味は同じで
+形が変わるもの。
+
+= ステミング
+
+develop, developped, developing
+を
+develop のみでヒットさせたい
+
+= ステミング
+
+ステミング(語幹処理)
+
+= ステミング
+
+語幹=単語の変化しない部分
+develop, developped, developing
+なら develop が語幹
+
+= ステミング
+
+曲用や活用で語形変化した語を語幹に変換する
+つまり
+develop, developped, developing
+を
+developに変換する
+
+= ステミング
+
+語幹となる語で検索すれば、活用、曲用後の語も検索できる
+
+= ステミング
+
+PGroongaではどうするのか？
+
+= ステミング
+
+トークンフィルター
+
+= ステミング
+
+トークナイズされたトークンを加工できる
+
+= ステミング
+
+  # coderay sql
+
+    CREATE TABLE steming_test (
+      title text
+    );
+    CREATE INDEX pgroonga_content_index ON steming_test USING pgroonga (title);
+
+    INSERT INTO tokenizer_test VALUES ('I develop Groonga');
+    INSERT INTO tokenizer_test VALUES ('I am developing Groonga');
+    INSERT INTO tokenizer_test VALUES ('I developed Groonga');
+
+    SELECT * FROM tokenizer_test WHERE title &@ 'develop';
+
+= ステミング
+
+  # coderay sql
+
+       title       
+-------------------
+ I develop Groonga
+(1 row)
+
+= ステミング
+
+  # coderay sql
+
+    CREATE INDEX pgroonga_content_index ON steming_test USING pgroonga (title) WITH (plugins='token_filters/stem', token_filters='TokenFilterStem');
+
+= ステミング
+
+          title          
+-------------------------
+ I develop Groonga
+ I am developing Groonga
+ I developed Groonga
+(3 rows)
 
 = ストップワード
 
+頻出語。文書中のどこにでもでてくる語。
+and, is 日本語だと 、や。
+
+= ストップワード
+
+文書中のどこにでもでてくる文字が検索キーワードに含まれていると、必要のない情報がヒットしやすい
+
+= ストップワード
+
+再現率が下がる
+
+= ストップワード
+
+ストップワードを除去することで再現率を上げる
+
+= ストップワード
+
+何をストップワードとするかは一概に決定できない
+
+= ストップワード
+
+PGroongaは、自分でストップワードを登録できる
+
 = 同義語展開
+
+意味が同じで、言葉が違う。
+「牛乳」と「ミルク」等
+
+= 同義語展開
+
+意味が同じならヒットしてほしい
 
 = 読みがな検索
 
+異体字、送り仮名の違い
+
+= 読みがな検索
+
+「広」と「廣」
+「焼肉」と「焼き肉」
+
 = fuzzy検索
 
+typo
+「テクノロジー」と「テノクロジー」
+
 = スコアリング
+
+検索結果順を決める
+
+= スコアリング
+
+何を元に「それっぽい」と判断するのか
+
+= スコアリング
+
+* TF(PGroongaのデフォルト)
+* TF-IDF
+
+= スコアリング
+
+何を元に「それっぽい」と判断するのか
+
+= スコアリング
+
+TF
+
+単語の出現数。
+検索キーワードがより多く含まれているレコードのスコアーが高くなる
+
+高速
+
+= スコアリング
+
+TF-IDF
+
+単語の出現数 * 単語のレア度
+
+検索キーワードがより多く含まれていて、検索キーワードがレアな単語だと
+スコアーが高くなる。
+
+TFに比べて低速
 
 = まとめ
 
