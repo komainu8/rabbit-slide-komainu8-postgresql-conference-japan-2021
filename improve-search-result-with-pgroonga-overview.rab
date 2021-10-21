@@ -1,0 +1,404 @@
+= PGroongaを使って\n全文検索結果を\nより良くする方法
+
+ : author
+    堀本 泰弘
+ : institution
+    株式会社クリアコード
+ : content-source
+    PostgreSQL Conference Japan 2021
+ : date
+    2021-11-12
+ : allotted-time
+    45m
+ : start-time
+    2021-11-12T16:10:00+09:00
+ : end-time
+    2021-11-12T16:55:00+09:00
+ : theme
+    .
+
+= 自己紹介
+
+  # image
+  # src = images/self-introduction.png
+  # relative_height = 107
+
+= 今日のテーマ
+
+PGroongaで\n検索結果を((*より良く*))しよう！
+
+= 検索結果の良し悪し
+
+検索結果が\n((*良い/悪い*))とは？
+
+= 検索結果の良し悪し
+
+* 😞検索漏れ
+* 😞ノイズが多い
+* 😞有用な情報を探し出せない
+
+= 検索の評価
+
+* 効率性
+* 有効性\n
+  -- 適合率/再現率、ランキング
+
+= 効率性
+
+((*少ないコスト*))で\n検索できるか
+
+= 効率性の指標
+
+* 単位時間あたりにどのくらいの検索クエリーをさばけるか
+* 1クエリーあたりの応答速度
+* メモリー、ストレージ使用量
+
+= 有効性
+
+検索結果の\n全体/一部が((*欲しい情報*))だったか
+
+= 有効性の指標
+
+* 適合率/再現率
+* ランキング
+
+= 適合率と再現率
+
+  # image
+  # src = images/precision-recall-1.png
+  # relative_height = 107
+
+= 適合率と再現率
+
+  # image
+  # src = images/precision-hight-recall-low.png
+  # relative_height = 120
+
+= 適合率と再現率
+
+  # image
+  # src = images/precision-low-recall-hight.png
+  # relative_height = 120
+
+= ランキング
+
+欲しい情報が\nランキング上位にあるか
+
+= ランキング
+
+ユーザーは\n((*上位数件*))\nしか見ない
+
+= PGroongaで検索結果の改善
+
+PGroongaで有効性を改善！
+
+= PGroongaで検索結果の改善
+
+* 適合率と再現率の改善
+
+  * ノーマライザー
+  * トークナイザー
+  * ステミング
+  * ストップワードの除外
+  * fuzzy検索
+  * 同義語展開
+
+= PGroongaで検索結果の改善
+
+* ランキングの改善
+
+  * スコアラー
+
+= PGroongaのノーマライザー\n(デフォルト)
+
+  # coderay sql
+
+    CREATE DATABASE pgroonga_test;
+    CREATE EXTENSION pgroonga;
+    CREATE TABLE normalizer_test (
+      id integer,
+      content text
+    );
+    CREATE INDEX pgroonga_content_index ON normalizer_test USING pgroonga (content);
+
+    INSERT INTO normalizer_test VALUES (1, 'キログラム');
+    INSERT INTO normalizer_test VALUES (2, 'きろぐらむ');
+    INSERT INTO normalizer_test VALUES (3, '㌕');
+    INSERT INTO normalizer_test VALUES (4, 'ｷﾛｸﾞﾗﾑ');
+    INSERT INTO normalizer_test VALUES (5, 'kiroguramu');
+    INSERT INTO normalizer_test VALUES (6, 'ｋｉｒｏｇｕｒａｍｕ');
+
+    SELECT * FROM normalizer_test WHERE content &@ 'キログラム';
+
+= PGroongaのノーマライザー\n(デフォルト)
+
+結果
+
+  # RT
+  delimiter = [|]
+
+  id | content
+
+  1 | キログラム
+  3 | ㌕
+  4 | ｷﾛｸﾞﾗﾑ
+
+= PGroongaのノーマライザー\n(デフォルト)
+
+デフォルトだと
+
+* 半角/全角を同一視
+* ㌕とキログラムを同一視
+
+= PGroongaのノーマライザー\n(デフォルト)
+
+PGroongaのデフォルトはNFKCを使った正規化\n
+※対象のテキストのエンコードがUTF-8の時
+
+= ノーマライザーの変更
+
+再現率を上げたい
+
+= PGroongaのノーマライザー\n(NormalizerNFKC130)
+
+  # coderay sql
+
+    DROP INDEX pgroonga_content_index;
+  CREATE INDEX pgroonga_content_index
+            ON normalizer_test
+         USING pgroonga (content)
+          WITH (normalizers='NormalizerNFKC130("unify_kana", true)');
+
+  SELECT * FROM normalizer_test WHERE content &@ 'キログラム';
+
+= PGroongaのノーマライザー\n(NormalizerNFKC130)
+
+結果
+
+  # RT
+  delimiter = [|]
+
+  id | content
+
+  1 | キログラム
+  2 | きろぐらむ
+  3 | ㌕
+  4 | ｷﾛｸﾞﾗﾑ
+
+= PGroongaのノーマライザー\n(NormalizerNFKC130)
+
+* unify_kana
+
+  * ひらがなとカタカナを同一視\n(e.g.「あ」と「ア」を同一視)
+
+= PGroongaのノーマライザー\n(NormalizerNFKC130)
+
+  # coderay sql
+
+    DROP INDEX pgroonga_content_index;
+  CREATE INDEX pgroonga_content_index
+            ON normalizer_test
+         USING pgroonga (content)
+          WITH (normalizers='NormalizerNFKC130("unify_to_romaji", true)');
+  SELECT * FROM normalizer_test WHERE content &@ 'キログラム';
+
+= PGroongaのノーマライザー\n(NormalizerNFKC130)
+
+結果
+
+  # RT
+  delimiter = [|]
+
+  id | content
+
+  1 | キログラム
+  2 | きろぐらむ
+  3 | ㌕
+  4 | ｷﾛｸﾞﾗﾑ
+
+= PGroongaのノーマライザー\n(NormalizerNFKC130)
+
+  # RT
+  delimiter = [|]
+
+  id | content
+
+  5 | kiroguramu
+  6 | ｋｉｒｏｇｕｒａｍｕ
+
+= PGroongaのノーマライザー\n(NormalizerNFKC130)
+
+* Unify_to_romaji
+
+  * ローマ字に正規化\nローマ字で読んだときに同じ語は同一視する
+  * (e.g. 「kiroguramu」と「きろぐらむ」を同一視。ローマ字読みが同じだから)
+
+= オプションの指定方法
+
+* 'NormalizerNFKC130\n("オプション名", true)');
+
+= 指定可能オプション一覧
+
+https://groonga.org/ja/docs/reference/normalizers/normalizer_nfkc130.html#syntax
+
+= PGroongaのトークナイザー\n(デフォルト)
+
+  # coderay sql
+
+    CREATE TABLE tokenizer_test (
+      title text
+    );
+    CREATE INDEX pgroonga_content_index ON tokenizer_test USING pgroonga (title);
+
+    INSERT INTO tokenizer_test VALUES ('京都府 1日目 金閣寺');
+    INSERT INTO tokenizer_test VALUES ('京都府 2日目 嵐山');
+    INSERT INTO tokenizer_test VALUES ('京都府 3日目 天橋立');
+    INSERT INTO tokenizer_test VALUES ('東京都 1日目 スカイツリー');
+    INSERT INTO tokenizer_test VALUES ('東京都 2日目 浅草寺');
+    INSERT INTO tokenizer_test VALUES ('北海道 1日目 函館');
+    INSERT INTO tokenizer_test VALUES ('北海道 2日目 トマム');
+    INSERT INTO tokenizer_test VALUES ('北海道 3日目 富良野');
+    INSERT INTO tokenizer_test VALUES ('北海道 4日目 美瑛');
+    INSERT INTO tokenizer_test VALUES ('北海道 5日目 旭川');
+
+    SELECT * FROM tokenizer_test WHERE title &@ '京都';
+
+= PGroongaのトークナイザー\n(デフォルト)
+
+  # coderay sql
+
+                    title                 
+    --------------------------------------
+     京都府 1日目 金閣寺
+     京都府 2日目 嵐山
+     京都府 3日目 天橋立
+     東京都 1日目 スカイツリー
+     東京都 2日目 浅草寺
+    (5 rows)
+
+= トークナイザーの変更
+
+再現率を上げる
+
+= PGroongaのトークナイザー\n(TokenMecab)
+
+  # coderay sql
+
+    DROP INDEX pgroonga_content_index;
+  CREATE INDEX pgroonga_content_index
+            ON tokenizer_test
+         USING pgroonga (title)
+          WITH (tokenizer='TokenMecab');
+
+  SELECT * FROM tokenizer_test WHERE title &@ '京都';
+
+= PGroongaのトークナイザー\n(TokenMecab)
+
+  # coderay sql
+
+            title        
+    ---------------------
+     京都府 1日目 金閣寺
+     京都府 2日目 嵐山
+     京都府 3日目 天橋立
+    (3 rows)
+
+= トークナイザーの指定方法
+
+* tokenizer='トークナイザー名'
+
+= 指定可能トークナイザー一覧
+
+https://groonga.org/ja/docs/reference/tokenizers.html
+
+= PGroongaのステミング\n(未使用)
+
+  # coderay sql
+
+    CREATE TABLE steming_test (
+      title text
+    );
+    CREATE INDEX pgroonga_content_index ON steming_test USING pgroonga (title);
+
+    INSERT INTO tokenizer_test VALUES ('I develop Groonga');
+    INSERT INTO tokenizer_test VALUES ('I am developing Groonga');
+    INSERT INTO tokenizer_test VALUES ('I developed Groonga');
+
+    SELECT * FROM tokenizer_test WHERE title &@ 'develop';
+
+= PGroongaのステミング\n(未使用)
+
+  # coderay sql
+
+       title       
+-------------------
+ I develop Groonga
+(1 row)
+
+= PGroongaのステミング
+
+  # coderay sql
+
+    CREATE INDEX pgroonga_content_index
+              ON steming_test
+           USING pgroonga (title)
+            WITH (plugins='token_filters/stem',
+                  token_filters='TokenFilterStem');
+
+= PGroongaのステミング
+
+          title          
+-------------------------
+ I develop Groonga
+ I am developing Groonga
+ I developed Groonga
+(3 rows)
+
+= PGroongaのストップワード
+
+= PGroongaのストップワード
+
+= PGroongaのストップワード
+
+= PGroongaのストップワード
+
+= PGroongaの同義語展開
+
+= PGroongaの同義語展開
+
+= PGroongaの同義語展開
+
+= PGroongaの同義語展開
+
+= PGroongaのfuzzy検索
+
+= PGroongaのfuzzy検索
+
+= PGroongaのfuzzy検索
+
+= PGroongaのfuzzy検索
+
+= スコアリングの改善
+
+* TF(PGroongaのデフォルト)
+* TF-IDF
+
+= PGroongaのスコアリング\nTF(デフォルト)
+
+= PGroongaのスコアリング\nTF(デフォルト)
+
+= PGroongaのスコアリング\nTF(デフォルト)
+
+= PGroongaのスコアリング\nTF-IDF
+
+= PGroongaのスコアリング\nTF-IDF
+
+= PGroongaのスコアリング\nTF-IDF
+
+= 参考資料
+
+= 参考
+
+* PGroonga自体の解説
+
+  * ((<URL:https://www.slideshare.net/kou/postgresql-conference-japan-2017>))
