@@ -57,6 +57,10 @@
 (1) 効率性\n低コストで検索できるかどうか
 (2) ((*有効性*))\n検索結果の全体 or 一部が\n((*欲しい情報*))だったかどうか
 
+= 検索の評価指標
+
+今日は有効性に\nついてのお話です
+
 = 有効性の指標
 
 (1) 適合率
@@ -91,19 +95,19 @@
 
 = PGroongaで検索結果の改善
 
-* 適合率と再現率の改善
+* PGroongaで適合率/再現率改善
 
-  * ノーマライザー
-  * トークナイザー
-  * ステミング
-  * fuzzy検索
-  * 同義語展開
+  * ノーマライザーを使う
+  * トークナイザーを使う
+  * ステミングを使う
+  * fuzzy検索を使う
+  * 同義語展開を使う
 
 = PGroongaで検索結果の改善
 
-* ランキングの改善
+* PGroongaでランキング改善
 
-  * スコアラー
+  * スコアラーを使う
 
 = PGroongaのノーマライザー\n(デフォルト)
 
@@ -127,8 +131,6 @@
     SELECT * FROM normalizer_test WHERE content &@ 'キログラム';
 
 = PGroongaのノーマライザー\n(デフォルト)
-
-結果
 
   # RT
   delimiter = [|]
@@ -166,8 +168,6 @@ PGroongaのデフォルトはNFKCを使った正規化\n
 
 = PGroongaのノーマライザー\n(NormalizerNFKC130)
 
-結果
-
   # RT
   delimiter = [|]
 
@@ -201,7 +201,7 @@ PGroongaのデフォルトはNFKCを使った正規化\n
 
 = 指定可能オプション一覧
 
-* NormalizerNFKC130のオプション
+* NormalizerNFKC130の\nオプション一覧
   * ((<URL:https://groonga.org/ja/docs/reference/normalizers/normalizer_nfkc130.html#syntax>))
 
 = PGroongaのトークナイザー\n(デフォルト)
@@ -241,7 +241,7 @@ PGroongaのデフォルトはNFKCを使った正規化\n
 
 = トークナイザーの変更
 
-適合率を上げる
+適合率を上げたい
 
 = PGroongaのトークナイザー\n(TokenMecab)
 
@@ -273,11 +273,11 @@ PGroongaのデフォルトはNFKCを使った正規化\n
 = 指定可能トークナイザー一覧
 
 * 使用可能なトークナイザー
-  * https://groonga.org/ja/docs/reference/tokenizers.html
+  * ((<URL:https://groonga.org/ja/docs/reference/tokenizers.html>))
 
 = ステミング(語幹処理)
 
-語形変化：\n意味は同じだが\n語の形が変わる
+語形変化\n意味は同じだが\n語の形が変わる
 
 = ステミング(語幹処理)
 
@@ -303,9 +303,9 @@ PGroongaのデフォルトはNFKCを使った正規化\n
 = ステミング(語幹処理)
 
 (('tag:left'))
-develop → develop\n
-developped → develop\n
-developing → develop
+develop → ((*develop*))\n
+developped → ((*develop*))\n
+developing → ((*develop*))
 
 = ステミング(語幹処理)
 
@@ -362,6 +362,7 @@ developing → develop
 
 = 同義語
 
+例えば\n
 「ミルク」と\n「牛乳」
 
 = 同義語
@@ -419,8 +420,13 @@ typo対策
 
 = 曖昧検索
 
-完全に一致していなくても
-似たような語ならヒットする
+* 似たような語ならヒットする
+(完全一致じゃなくてもヒットする)
+
+= 曖昧検索
+
+「テノクロジー」で\n
+「テクノロジー」がヒット
 
 = PGroongaのfuzzy検索
 
@@ -450,26 +456,31 @@ typo対策
 
   テクノロジー
 
-= スコアリングの改善
+= スコアリング
+
+何を基準に\nランキングを\n決めるのか
+
+= PGroongaのスコアリング
 
 * TF(PGroongaのデフォルト)
 * TF-IDF
 
 = PGroongaのスコアリング\nTF(デフォルト)
 
-* 検索キーワードが文書内により多く含まれる文書のスコアーが高くなる
+単語の((*出現数*))が大事
 
 = PGroongaのスコアリング\nTF(デフォルト)
 
-単語の((*出現数*))が大事
+* 検索キーワードが文書内に多く含まれる文書のスコアーが高くなる
 
 = PGroongaのスコアリング\nTF-IDF
 
-単語のレア度が大事
+単語の((*レア度*))\nが大事
 
 = PGroongaのスコアリング\nTF-IDF
 
-レアな単語が多く出現する文書のスコアーが高くなる
+* 文書に出てくる頻度が高い\n(レア度低い)
+* 文書に出てくる頻度が低い\n(レア度高い)
 
 = PGroongaのスコアリング\nTF-IDF
 
@@ -491,11 +502,22 @@ typo対策
     SELECT *, pgroonga_score(tableoid, ctid) AS score
       FROM memos
      WHERE content &@~
-       ('Groonga',
+       ('PostgreSQL OR 検索',
         ARRAY[1],
         ARRAY['scorer_tf_idf($index)'],
         'pgroonga_memos_index')::pgroonga_full_text_search_condition_with_scorers
      ORDER BY score DESC;
+
+= PGroongaのスコアリング\nTF-IDF
+
+  # RT
+  delimiter = [|]
+
+  title | score
+
+  Groonga    | 1.3862943649291992
+  PostgreSQL | 1
+  PGroonga   | 1
 
 = 参考資料
 
