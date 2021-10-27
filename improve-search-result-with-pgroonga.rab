@@ -23,153 +23,88 @@
   # src = images/self-introduction.png
   # relative_height = 107
 
-= 今日のテーマ
+= 検索の評価指標
 
-PGroongaで\n検索結果を((*より良く*))しよう！
+よく検索結果が\n
+((*いまいち*))だ...\n
+という話を\n聞きます
 
-= 今日のテーマ
+= 検索の評価指標
 
-...の前に
+  # image
+  # src = images/search-result-01.png
+  # relative_height = 100
 
-= PGroongaとは？
+= 検索の評価指標
 
-PGroonga?\n
-(ぴーじーるんが)
+* 😞検索漏れ
+* 😞ノイズが多い
+* 😞有用な情報を探し出せない
 
-= PGroongaとは？
+= 検索の評価指標
 
-PostgreSQLで\n((*高速・高機能な*))全文検索を実現\nする拡張
+(1) 効率性\n低コストで検索できるかどうか
+(2) ((*有効性*))\n検索結果の全体 or 一部が\n((*欲しい情報*))だったかどうか
 
-= PGroongaの特徴
+= 検索の評価指標
 
-(1) 簡単に使える
-(2) 速い
-(3) ((*高機能*))
+今日は有効性に\nついてのお話です
 
-= 今日のテーマ
+= 目次
 
-今日は特に\n
-((*高機能*))\n
-に注目します！
+(1) 検索の評価指標
+(2) PGroongaで検索結果の改善
+(3) 参考資料
 
-= 全文検索結果の改善
+= 有効性の指標
 
-PGroongaで検索は速くなった😁
-
-= 全文検索
-
-でも、検索結果がいまいち。。。😞
-
-= 検索結果の良し悪し
-
-そもそも\n((*検索結果が悪い*))とは？
-
-= 検索結果の良し悪し
-
-検索漏れがある😞
-
-= 検索結果の良し悪し
-
-ノイズが多い\n😞
-
-= 検索結果の良し悪し
-
-有用な情報を\n探し出せない\n😞
+(1) 適合率
+(2) 再現率
+(3) ランキング
 
 = 適合率と再現率
 
-適合率と再現率
-
-= 適合率？
-
-* 検索結果の中にどれだけ正解が含まれるか。
-* 適合率↑ノイズ↓
-
-= 再現率？
-
-* 検索キーワードに関連するレコードの中からどれだけ検索にヒットするか。
-* 再現率↑検索漏れ↓
+  # image
+  # src = images/precision-recall-1.png
+  # relative_height = 82
 
 = 適合率と再現率
 
-* 適合率と再現率はトレードオフ
-* 適合率↑再現率↓
-* 再現率↑適合率↓
+  # image
+  # src = images/precision-hight-recall-low.png
+  # relative_height = 90
+
+= 適合率と再現率
+
+  # image
+  # src = images/precision-low-recall-hight.png
+  # relative_height = 90
 
 = ランキング
 
-検索結果の表示順
+欲しい情報が\nランキング((*上位*))にあるか
 
 = ランキング
 
 ユーザーは\n((*上位数件*))\nしか見ない
 
-= ランキング
+= PGroongaで検索結果の改善
 
-すごくほしい情報があっても\n30件目にあったら((*見ない*))
+* PGroongaで適合率/再現率改善
 
-= ランキング
-
-ほしそうな情報を上位に持ってこれるかも大事
+  * ノーマライザーを使う
+  * トークナイザーを使う
+  * ステミングを使う
+  * fuzzy検索を使う
+  * 同義語展開を使う
 
 = PGroongaで検索結果の改善
 
-PGroongaで適合率、再現率、ランキングを改善！
+* PGroongaでランキング改善
 
-= 適合率と再現率の改良
+  * スコアラーを使う
 
-具体的には以下の機能を使う
-
-* ノーマライザー
-* トークナイザー
-* スコアラー
-
-= ノーマライザー
-
-何ができるのか？
-
-= ノーマライザー
-
-同一視
-
-= ノーマライザー
-
-例えば、
-
-* "㌕"と"キログラム"
-* "きろぐらむ"と"キログラム"
-* "ｷﾛｸﾞﾗﾑ"と"キログラム"
-
-= ノーマライザー
-
-検索キーワード："キログラム"
-
-* "㌕" ((*HIT*))
-* "きろぐらむ" ((*HIT*))
-* "ｷﾛｸﾞﾗﾑ" ((*HIT*))
-
-となってほしい
-
-= ノーマライザー
-
-ノーマライザーを使う
-
-= ノーマライザー
-
-以下を全部同じものとして扱う\n(同一視する)
-
-* "キログラム"
-* "㌕"
-* "きろぐらむ"
-* "ｷﾛｸﾞﾗﾑ"
-
-= ノーマライザー
-
-PGroongaで\nノーマライザー？
-
-= ノーマライザー
-
-まずは、デフォルトで実行
+= PGroongaのノーマライザー\n(デフォルト)
 
   # coderay sql
 
@@ -190,9 +125,7 @@ PGroongaで\nノーマライザー？
 
     SELECT * FROM normalizer_test WHERE content &@ 'キログラム';
 
-= ノーマライザー
-
-結果
+= PGroongaのノーマライザー\n(デフォルト)
 
   # RT
   delimiter = [|]
@@ -203,85 +136,32 @@ PGroongaで\nノーマライザー？
   3 | ㌕
   4 | ｷﾛｸﾞﾗﾑ
 
-= ノーマライザー
-
-デフォルトだと
+= PGroongaのノーマライザー\n(デフォルト)
 
 * 半角/全角を同一視
 * ㌕とキログラムを同一視
 
-= ノーマライザー
+= PGroongaのノーマライザー\n(デフォルト)
 
-PGroongaはデフォルトでNFKCを使った正規化を行う
-(対象のテキストのエンコードがUTF-8の時)
+PGroongaのデフォルトはNFKCを使った正規化\n
+※対象のテキストのエンコードがUTF-8の時
 
-= ノーマライザー
-
-以下はヒットしない。
-
-* 'きろぐらむ'
-* 'kiroguramu'
-* 'ｋｉｒｏｇｕｒａｍｕ'
-
-= ノーマライザー
+= ノーマライザーの変更
 
 再現率を上げたい
 
-= ノーマライザー
-
-ノーマライザーを変えてみる
-
-= ノーマライザー
+= PGroongaのノーマライザー\n(NormalizerNFKC130)
 
   # coderay sql
 
-    CREATE INDEX pgroonga_content_index
-              ON normalizer_test
-           USING pgroonga (content)
-            WITH (normalizers='NormalizerNFKC130');
+    DROP INDEX pgroonga_content_index;
+  CREATE INDEX pgroonga_content_index
+            ON normalizer_test
+         USING pgroonga (content)
+          WITH (normalizers='NormalizerNFKC130("unify_to_romaji", true)');
+  SELECT * FROM normalizer_test WHERE content &@ 'キログラム';
 
-= ノーマライザー
-
-結果
-
-  # RT
-  delimiter = [|]
-
-  id | content
-
-  1 | キログラム
-  3 | ㌕
-  4 | ｷﾛｸﾞﾗﾑ
-
-= ノーマライザー
-
-変わらない。。。
-
-= ノーマライザー
-
-どちらもNFKCを使った正規化なので結果同じ
-
-* デフォルトのノーマライザー
-* NormalizerNFKC130
-
-= ノーマライザー
-
-違い
-
-* NormalizerNFKC130はオプションをつかって((*挙動を変更*))できる！
-
-= ノーマライザー
-
-  # coderay sql
-
-    CREATE INDEX pgroonga_content_index
-              ON normalizer_test
-           USING pgroonga (content)
-            WITH (normalizers='NormalizerNFKC130("unify_kana", true)');
-
-= ノーマライザー
-
-結果
+= PGroongaのノーマライザー\n(NormalizerNFKC130)
 
   # RT
   delimiter = [|]
@@ -293,59 +173,7 @@ PGroongaはデフォルトでNFKCを使った正規化を行う
   3 | ㌕
   4 | ｷﾛｸﾞﾗﾑ
 
-= ノーマライザー
-
-新たに\n
-'きろぐらむ'\n
-がヒット
-
-= ノーマライザー
-
-何をしたのか？
-
-= ノーマライザー
-
-* unify_kana
-
-  * ひらがなとカタカナを同一視\n(e.g.「あ」と「ア」を同一視)
-
-= ノーマライザー
-
-unify_kanaで\n
-「きろぐらむ」\n
-がヒットする
-
-= ノーマライザー
-
-* 「kiroguramu」
-* 「'ｋｉｒｏｇｕｒａｍｕ'」
-
-をヒットさせるには？
-
-= ノーマライザー
-
-  # coderay sql
-
-    CREATE INDEX pgroonga_content_index
-              ON normalizer_test
-           USING pgroonga (content)
-            WITH (normalizers='NormalizerNFKC130("unify_to_romaji", true)');
-
-= ノーマライザー
-
-結果
-
-  # RT
-  delimiter = [|]
-
-  id | content
-
-  1 | キログラム
-  2 | きろぐらむ
-  3 | ㌕
-  4 | ｷﾛｸﾞﾗﾑ
-
-= ノーマライザー
+= PGroongaのノーマライザー\n(NormalizerNFKC130)
 
   # RT
   delimiter = [|]
@@ -355,87 +183,23 @@ unify_kanaで\n
   5 | kiroguramu
   6 | ｋｉｒｏｇｕｒａｍｕ
 
-= ノーマライザー
-
-Complate!
-
-= ノーマライザー
-
-何をしたのか？
-
-= ノーマライザー
+= PGroongaのノーマライザー\n(NormalizerNFKC130)
 
 * Unify_to_romaji
 
   * ローマ字に正規化\nローマ字で読んだときに同じ語は同一視する
   * (e.g. 「kiroguramu」と「きろぐらむ」を同一視。ローマ字読みが同じだから)
 
-= ノーマライザー
+= オプションの指定方法
 
-ただ、2,5,6はノイズの可能性が高い。
+* 'NormalizerNFKC130\n("オプション名", true)');
 
-= その他のオプション
+= 指定可能オプション一覧
 
-* unify_kana_case：拗音と促音を同一視
-* unify_kana_voiced_sound_mark：濁点、半濁点を同一視
-* unify_hyphen：ハイフンを同一視
-* unify_prolonged_sound_mark：長音記号を同一視
-* unify_hyphen_and_prolonged_sound_mark：ハイフンと長音記号を同一視
-* unify_middle_dot：中点を同一視
-* unify_katakana_v_sounds：ヴァヴィヴヴェヴォをバビブベボに正規化
-* unify_katakana_bu_sound：ヴァヴィヴヴェヴォをブに正規化
-* remove_blank：空白文字を除去
-* remove_new_line：改行文字を除去
+* NormalizerNFKC130の\nオプション一覧
+  * ((<URL:https://groonga.org/ja/docs/reference/normalizers/normalizer_nfkc130.html#syntax>))
 
-= ノーマライザー
-
-たくさんありますね！
-
-= トークナイザー
-
-次は、トークナイザー
-
-= トークナイザー
-
-何ができるのか？
-
-= トークナイザー
-
-トークナイザーはデータをトークンという単位に区切る
-
-= トークナイザー
-
-例えば、
-
-This is a pen
--> Th / hi / is / s  /  i / is / s  /  a / a  /  p / pe / en / n
-
-= トークナイザー
-
-これはペンです
--> これ / れは / はペ / ペン / ンで / です / す
-= トークナイザー
-
-検索キーワードも同様にトークンに区切る。
-
-= トークナイザー
-
-検索キーワード:pen
-pen -> pe / en / n
-
-= トークナイザー
-
-データの中に pe / en / n がこの順序ででてくるデータを取得する。
-
-= トークナイザー
-
-トークナイザーによって、適合率も再現率も変わる。
-
-= トークナイザー
-
-適合率を上げてみる
-
-= トークナイザー
+= PGroongaのトークナイザー\n(デフォルト)
 
   # coderay sql
 
@@ -457,148 +221,86 @@ pen -> pe / en / n
 
     SELECT * FROM tokenizer_test WHERE title &@ '京都';
 
-= トークナイザー
+= PGroongaのトークナイザー\n(デフォルト)
 
-結果
+  # RT
+  delimiter = [|]
 
-= トークナイザー
+  title
 
-  # coderay sql
+  京都府 1日目 金閣寺
+  京都府 2日目 嵐山
+  京都府 3日目 天橋立
+  東京都 1日目 スカイツリー
+  東京都 2日目 浅草寺
 
-                    title                 
-    --------------------------------------
-     京都府 1日目 金閣寺
-     京都府 2日目 嵐山
-     京都府 3日目 天橋立
-     東京都 1日目 スカイツリー
-     東京都 2日目 浅草寺
-    (5 rows)
+= トークナイザーの変更
 
-= トークナイザー
+適合率を上げたい
 
-"東京都"がヒットする。。。
-
-= トークナイザー
-
-なぜ？
-
-= トークナイザー
-
-東京都 -> 東京 / ((*京都*)) / 都
-京都府 -> 京都 / 都府 / 府
-
-= トークナイザー
-
-再現率を上げる
-
-= トークナイザー
-
-東京都のレコードはノイズなのでヒットしてほしくない
-
-= トークナイザー
-
-トークナイザーを変える
-
-= トークナイザー
+= PGroongaのトークナイザー\n(TokenMecab)
 
   # coderay sql
 
-    CREATE INDEX pgroonga_content_index ON tokenizer_test USING pgroonga (title) WITH (tokenizer='TokenMecab');
+    DROP INDEX pgroonga_content_index;
+  CREATE INDEX pgroonga_content_index
+            ON tokenizer_test
+         USING pgroonga (title)
+          WITH (tokenizer='TokenMecab');
 
-= トークナイザー
+  SELECT * FROM tokenizer_test WHERE title &@ '京都';
 
-結果
+= PGroongaのトークナイザー\n(TokenMecab)
 
-= トークナイザー
+  # RT
+  delimiter = [|]
 
-        title        
----------------------
- 京都府 1日目 金閣寺
- 京都府 2日目 嵐山
- 京都府 3日目 天橋立
-(3 rows)
+  title
 
-= トークナイザー
+  京都府 1日目 金閣寺
+  京都府 2日目 嵐山
+  京都府 3日目 天橋立
 
-他にも
-* TokenBigram
-* TokenBigramIgnoreBlank
-* TokenBigramIgnoreBlankSplitSymbol
-* TokenBigramIgnoreBlankSplitSymbolAlpha
-* TokenBigramIgnoreBlankSplitSymbolAlphaDigit
-* TokenBigramSplitSymbol
-* TokenBigramSplitSymbolAlpha
-* TokenBigramSplitSymbolAlphaFigit
-* TokenDelimit
-* TokenDelimitNull
-* TokenNgram
-* TokenPattern
-* TokenRegexp
-* TokenTable
-* TokenTrigram
-* TokenUnigram
+= トークナイザーの指定方法
 
-= ステミング
+* tokenizer='トークナイザー名'
 
-語形変化
+= 指定可能トークナイザー一覧
 
-= ステミング
+* 使用可能なトークナイザー
+  * ((<URL:https://groonga.org/ja/docs/reference/tokenizers.html>))
 
-意味は同じで形が変わるもの。
+= ステミング(語幹処理)
 
-名詞の語形変化は曲用
-動詞の語形変化は活用
+語形変化\n意味は同じだが\n語の形が変わる
 
-= ステミング
+= ステミング(語幹処理)
 
 例えば
 
-develop, developped, developing
+* develop(原形)
+* developped(過去形)
+* developing(進行形)
 
-のように、原形、過去形、進行形と意味は同じで
-形が変わるもの。
+意味は同じだが語形は異なる
 
-= ステミング
+= ステミング(語幹処理)
 
-develop, developped, developing
-を
-develop のみでヒットさせたい
+語幹：単語の変化しない部分
 
-= ステミング
+= ステミング(語幹処理)
 
-ステミング(語幹処理)
+(('tag:left'))
+((*develop*))\n
+((*develop*))ped\n
+((*develop*))ing
 
-= ステミング
+= ステミング(語幹処理)
 
-語幹=単語の変化しない部分
-develop, developped, developing
-なら develop が語幹
+語幹で検索\n
+->語形変化後の語も検索できる
 
-= ステミング
-
-曲用や活用で語形変化した語を語幹に変換する
-つまり
-develop, developped, developing
-を
-developに変換する
-
-= ステミング
-
-語幹となる語で検索すれば、活用、曲用後の語も検索できる
-
-= ステミング
-
-PGroongaではどうするのか？
-
-= ステミング
-
-トークンフィルター
-
-= ステミング
-
-トークナイズされたトークンを加工できる
-
-= ステミング
+= PGroongaのステミング\n(未使用)
 
   # coderay sql
 
@@ -613,137 +315,201 @@ PGroongaではどうするのか？
 
     SELECT * FROM tokenizer_test WHERE title &@ 'develop';
 
-= ステミング
+= PGroongaのステミング\n(未使用)
+
+  # RT
+  delimiter = [|]
+
+  title
+
+  I develop Groonga
+
+= PGroongaのステミング
 
   # coderay sql
 
-       title       
--------------------
- I develop Groonga
-(1 row)
+    CREATE INDEX pgroonga_content_index
+              ON steming_test
+           USING pgroonga (title)
+            WITH (plugins='token_filters/stem',
+                  token_filters='TokenFilterStem');
 
-= ステミング
+= PGroongaのステミング
+
+  # RT
+  delimiter = [|]
+
+  title
+
+  I develop Groonga
+  I am developing Groonga
+  I developed Groonga
+
+= 同義語
+
+同義語：同じ意味を持つ別の語
+
+= 同義語
+
+例えば\n
+「ミルク」と\n「牛乳」
+
+= 同義語
+
+意味が同じものはヒットしてほしい
+
+= 同義語展開
+
+ミルク -> \n
+ミルク OR 牛乳
+
+= PGroongaの同義語展開
 
   # coderay sql
 
-    CREATE INDEX pgroonga_content_index ON steming_test USING pgroonga (title) WITH (plugins='token_filters/stem', token_filters='TokenFilterStem');
+    CREATE TABLE synonyms (
+      term text PRIMARY KEY,
+      synonyms text[]
+    );
 
-= ステミング
+    CREATE INDEX synonyms_search ON synonyms USING pgroonga (term pgroonga.text_term_search_ops_v2);
 
-          title          
--------------------------
- I develop Groonga
- I am developing Groonga
- I developed Groonga
-(3 rows)
+    INSERT INTO synonyms (term, synonyms) VALUES ('ミルク', ARRAY['ミルク', '牛乳']);
+    INSERT INTO synonyms (term, synonyms) VALUES ('牛乳', ARRAY['牛乳', 'ミルク']);
 
-= ストップワード
+    CREATE TABLE memos (
+      id integer,
+      content text
+    );
 
-頻出語。文書中のどこにでもでてくる語。
-and, is 日本語だと 、や。
+    INSERT INTO memos VALUES (1, '牛乳石鹸');
+    INSERT INTO memos VALUES (2, 'ミルクジャム');
+    INSERT INTO memos VALUES (3, 'ストロベリー');
 
-= ストップワード
+    CREATE INDEX pgroonga_content_index ON memos USING pgroonga (content);
 
-文書中のどこにでもでてくる文字が検索キーワードに含まれていると、必要のない情報がヒットしやすい
-
-= ストップワード
-
-再現率が下がる
-
-= ストップワード
-
-ストップワードを除去することで再現率を上げる
-
-= ストップワード
-
-何をストップワードとするかは一概に決定できない
-
-= ストップワード
-
-PGroongaは、自分でストップワードを登録できる
+    SELECT * FROM memos
+      WHERE
+        content &@~
+          pgroonga_query_expand('synonyms', 'term', 'synonyms', '牛乳');
 
 = 同義語展開
 
-意味が同じで、言葉が違う。
-「牛乳」と「ミルク」等
+  # RT
+  delimiter = [|]
 
-= 同義語展開
+  id | content
 
-意味が同じならヒットしてほしい
+  1 | 牛乳石鹸
+  2 | ミルクジャム
 
-= 読みがな検索
+= 曖昧検索
 
-異体字、送り仮名の違い
+typo対策
 
-= 読みがな検索
+= 曖昧検索
 
-「広」と「廣」
-「焼肉」と「焼き肉」
+* 似たような語ならヒットする
+(完全一致じゃなくてもヒットする)
 
-= fuzzy検索
+= 曖昧検索
 
-typo
-「テクノロジー」と「テノクロジー」
+「テノクロジー」で\n
+「テクノロジー」がヒット
 
-= スコアリング
+= PGroongaのfuzzy検索
 
-検索結果順を決める
+  # coderay sql
 
-= スコアリング
+    CREATE TABLE tags (
+      name text
+    );
 
-何を元に「それっぽい」と判断するのか
+    CREATE INDEX tags_search ON tags USING pgroonga(name) WITH (tokenizer='');
+    INSERT INTO tags VALUES ('テクノロジー');
+    INSERT INTO tags VALUES ('テクニカル');
 
-= スコアリング
+    SELECT name FROM tags
+      WHERE
+        name &`
+          ('fuzzy_search(name, ' || pgroonga_escape('テノクロジー') || ',
+                         {"with_transposition": true,
+                          "max_distance": 1})');
+
+= 曖昧検索
+
+  # RT
+  delimiter = [|]
+
+  name
+
+  テクノロジー
+
+= PGroongaでランキング改善
+
+何を基準に\nランキングを\n決めるのか
+
+= PGroongaのスコアリング
 
 * TF(PGroongaのデフォルト)
 * TF-IDF
 
-= スコアリング
+= PGroongaのスコアリング\nTF(デフォルト)
 
-何を元に「それっぽい」と判断するのか
+単語の((*出現数*))\nが大事
 
-= スコアリング
+= PGroongaのスコアリング\nTF(デフォルト)
 
-TF
+* 検索キーワードが文書内に多く含まれる文書のスコアーが高くなる
 
-単語の出現数。
-検索キーワードがより多く含まれているレコードのスコアーが高くなる
+= PGroongaのスコアリング\nTF-IDF
 
-高速
+単語の((*レア度*))\nが大事
 
-= スコアリング
+= PGroongaのスコアリング\nTF-IDF
 
-TF-IDF
+* 文書に出てくる頻度が高い\n(レア度低い)
+* 文書に出てくる頻度が低い\n(レア度高い)
 
-単語の出現数 * 単語のレア度
+= PGroongaのスコアリング\nTF-IDF
 
-検索キーワードがより多く含まれていて、検索キーワードがレアな単語だと
-スコアーが高くなる。
+  # coderay sql
 
-TFに比べて低速
+    CREATE TABLE memos (
+      title text,
+      content text
+    );
 
-= まとめ
+    CREATE INDEX pgroonga_memos_index
+        ON memos
+     USING pgroonga (content);
+    INSERT INTO memos VALUES ('PostgreSQL', 'PostgreSQLはリレーショナル・データベース管理システムです。');
+    INSERT INTO memos VALUES ('Groonga', 'Groongaは日本語対応の高速な全文検索エンジンです。');
+    INSERT INTO memos VALUES ('PGroonga', 'PGroongaはインデックスとしてGroongaを使うためのPostgreSQLの拡張機能です。');
+    INSERT INTO memos VALUES ('コマンドライン', 'groongaコマンドがあります。');
 
-PGroongaを使って、検索結果を改善できました！
+    SELECT *, pgroonga_score(tableoid, ctid) AS score
+      FROM memos
+     WHERE content &@~
+       ('PostgreSQL OR 検索',
+        ARRAY[1],
+        ARRAY['scorer_tf_idf($index)'],
+        'pgroonga_memos_index')::pgroonga_full_text_search_condition_with_scorers
+     ORDER BY score DESC;
+
+= PGroongaのスコアリング\nTF-IDF
+
+  # RT
+  delimiter = [|]
+
+  title | score
+
+  Groonga    | 1.3862943649291992
+  PostgreSQL | 1
+  PGroonga   | 1
 
 = 参考資料
-
-= 参考
 
 * PGroonga自体の解説
 
   * ((<URL:https://www.slideshare.net/kou/postgresql-conference-japan-2017>))
-
-= 参考
-
-* PHPのマニュアル検索
-  * ((<URL:https://www.slideshare.net/kou/phpconference2017>))
-
-* Redmineのチケットを検索
-  * ((<URL:https://www.slideshare.net/kou/redminetokyo12>))
-  * ((<URL:https://github.com/clear-code/redmine_full_text_search>))
-
-= 参考
-
-* AWSでPGroongaを使う
-  * ((<URL:https://slide.rabbit-shocker.org/authors/komainu8/postgresql-conference-japan-2019/>))
