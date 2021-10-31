@@ -43,6 +43,11 @@
 
 = 検索の評価指標
 
+検索の評価指標は\n
+2種類
+
+= 検索の評価指標
+
 (1) 効率性\n低コストで検索できるかどうか
 (2) ((*有効性*))\n検索結果の全体 or 一部が\n((*欲しい情報*))だったかどうか
 
@@ -50,13 +55,7 @@
 
 今日は有効性に\nついてのお話です
 
-= 目次
-
-(1) 検索の評価指標
-(2) PGroongaで検索結果の改善
-(3) 参考資料
-
-= 有効性の指標
+= 基本的な有効性の指標
 
 (1) 適合率
 (2) 再現率
@@ -445,6 +444,41 @@ typo対策
 
   テクノロジー
 
+= 高度な話題
+
+処理順序
+
+1. ノーマライズ
+2. トークナイズ
+3. トークンフィルター
+
+= 高度な話題
+
+例)
+
+= 高度な話題
+
+トークナイズ後にノーマライズしたい場合
+
+= 高度な話題
+
+処理順序
+
+1. ノーマライズ
+2. トークナイズ
+3. ((*トークンフィルター*))
+
+= 高度な話題
+
+トークンフィルターでノーマライズ
+
+= 高度な話題
+
+TokenFilterNFKC100を使う
+
+* 動作は、NormalizerNFKC130と同じ
+* オプションも同じ
+
 = PGroongaでランキング改善
 
 何を基準に\nランキングを\n決めるのか
@@ -513,3 +547,25 @@ typo対策
 * PGroonga自体の解説
 
   * ((<URL:https://www.slideshare.net/kou/postgresql-conference-japan-2017>))
+
+= 参考資料
+
+* ノーマライザーのオプション一覧
+  * ((<URL::https://groonga.org/ja/docs/reference/normalizers/normalizer_nfkc130.html#parameters>))
+
+= 参考資料
+
+* 使用可能なトークナイザー一覧
+　* ((<URL::https://groonga.org/ja/docs/reference/tokenizers.html>))
+
+= 参考資料
+
+* 同義語検索の方法
+  * ((<URL::https://pgroonga.github.io/ja/how-to/synonyms.html>))
+
+= 参考資料
+
+* 使用可能なスコアラー一覧
+  * ((<URL::https://groonga.org/ja/docs/reference/scorer.html#built-in-scorers>))
+
+
