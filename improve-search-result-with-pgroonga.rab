@@ -23,6 +23,15 @@
   # src = images/self-introduction.png
   # relative_height = 107
 
+= 今日のテーマ
+
+検索結果の改善
+
+= 目次
+
+(1) 検索の評価指標
+(2) PGrooongaで検索結果の改善
+
 = 検索の評価指標
 
 よく検索結果が\n
@@ -51,21 +60,24 @@
 (1) 効率性\n低コストで検索できるかどうか
 (2) ((*有効性*))\n検索結果の全体 or 一部が\n((*欲しい情報*))だったかどうか
 
-= 検索の評価指標
-
-今日は有効性に\nついてのお話です
-
 = 基本的な有効性の指標
 
 (1) 適合率
 (2) 再現率
 (3) ランキング
 
-= 適合率と再現率
+= 適合率
 
-  # image
-  # src = images/precision-recall-1.png
-  # relative_height = 82
+例) 過去の不具合事例の検索
+
+PGroongaでNormalizeのオプションA,Bを使うと期待した結果にならない。
+
+PGroonga NormalizerNFKC130 A BでRedmineを検索
+
+☓ PGroonga NormalizerNFKC130 A_v_sounds B
+☓ PGroonga NormalizerNFKC130 A_bu_sounds B
+○ PGroonga NormalizerNFKC130 A B
+○ Groonga NormalizerNFKC130 A B(HITせず)
 
 = 適合率と再現率
 
@@ -78,6 +90,19 @@
   # image
   # src = images/precision-low-recall-hight.png
   # relative_height = 90
+
+= 再現率の注意点
+
+Web検索のような検索対象が膨大な場合は
+再現率という指標はあまり意味がない。
+
+関連する情報がどのくらいヒットしているかには
+興味がない。
+
+こういう場合は適合率が重要。
+
+一方で、検索漏れがあっては困る領域では重要。
+例えば、特許の検索であったり、裁判の判例の検索であったり。
 
 = ランキング
 
@@ -102,6 +127,11 @@
 * PGroongaでランキング改善
 
   * スコアラーを使う
+
+= PGroongaのノーマライザー\n(デフォルト)
+
+ノーマライザー\n
+(同一視)
 
 = PGroongaのノーマライザー\n(デフォルト)
 
@@ -192,6 +222,13 @@ PGroongaのデフォルトはNFKCを使った正規化\n
 = オプションの指定方法
 
 * 'NormalizerNFKC130\n("オプション名", true)');
+
+= 複数オプションの指定方法
+
+'NormalizerNFKC130(\n
+"オプション名", true,\n
+"オプション名", true,\n
+...)');
 
 = 指定可能オプション一覧
 
@@ -344,6 +381,8 @@ PGroongaのデフォルトはNFKCを使った正規化\n
   I am developing Groonga
   I developed Groonga
 
+= ステミングの使用方法
+
 = 同義語
 
 同義語：同じ意味を持つ別の語
@@ -402,6 +441,8 @@ PGroongaのデフォルトはNFKCを使った正規化\n
   1 | 牛乳石鹸
   2 | ミルクジャム
 
+= 同義語展開の使い方
+
 = 曖昧検索
 
 typo対策
@@ -444,13 +485,16 @@ typo対策
 
   テクノロジー
 
+= 曖昧検索の使い方
+
+
 = 高度な話題
 
 処理順序
 
-1. ノーマライズ
-2. トークナイズ
-3. トークンフィルター
+(1) ノーマライズ
+(2) トークナイズ
+(3) トークンフィルター
 
 = 高度な話題
 
@@ -462,15 +506,15 @@ typo対策
 
 = 高度な話題
 
-処理順序
-
-1. ノーマライズ
-2. トークナイズ
-3. ((*トークンフィルター*))
+トークンフィルターでノーマライズ
 
 = 高度な話題
 
-トークンフィルターでノーマライズ
+処理順序
+
+(1) ノーマライズ
+(2) トークナイズ
+(3) ((*トークンフィルター*))
 
 = 高度な話題
 
@@ -482,6 +526,10 @@ TokenFilterNFKC100を使う
 = PGroongaでランキング改善
 
 何を基準に\nランキングを\n決めるのか
+
+= PGroongaのスコアー
+
+スコアー
 
 = PGroongaのスコアリング
 
@@ -533,14 +581,15 @@ TokenFilterNFKC100を使う
 
 = PGroongaのスコアリング\nTF-IDF
 
+(要確認)
   # RT
   delimiter = [|]
 
   title | score
 
-  Groonga    | 1.3862943649291992
+  PGroonga    | 1.3862943649291992
   PostgreSQL | 1
-  PGroonga   | 1
+  Groonga   | 1
 
 = 参考資料
 
@@ -551,21 +600,24 @@ TokenFilterNFKC100を使う
 = 参考資料
 
 * ノーマライザーのオプション一覧
-  * ((<URL::https://groonga.org/ja/docs/reference/normalizers/normalizer_nfkc130.html#parameters>))
+
+  * ((<URL:https://groonga.org/ja/docs/reference/normalizers/normalizer_nfkc130.html#parameters>))
 
 = 参考資料
 
 * 使用可能なトークナイザー一覧
-　* ((<URL::https://groonga.org/ja/docs/reference/tokenizers.html>))
+
+　* ((<URL:https://groonga.org/ja/docs/reference/tokenizers.html>))
 
 = 参考資料
 
 * 同義語検索の方法
-  * ((<URL::https://pgroonga.github.io/ja/how-to/synonyms.html>))
+
+  * ((<URL:https://pgroonga.github.io/ja/how-to/synonyms.html>))
 
 = 参考資料
 
 * 使用可能なスコアラー一覧
-  * ((<URL::https://groonga.org/ja/docs/reference/scorer.html#built-in-scorers>))
+  * ((<URL:https://groonga.org/ja/docs/reference/scorer.html#built-in-scorers>))
 
 
