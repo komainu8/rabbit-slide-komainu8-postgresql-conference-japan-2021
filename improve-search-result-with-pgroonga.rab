@@ -68,6 +68,20 @@
 
 = 適合率
 
+  # LaTeX
+  # relative_width = 10
+
+  $${ユーザーが欲しいドキュメント}/{検索にヒットしたドキュメント}$$
+
+= 再現率
+
+  # LaTeX
+  # relative_width = 10
+
+  $${検索にヒットしたドキュメント}/{ユーザーが欲しいドキュメント}$$
+
+= 適合率と再現率
+
 例) 過去の不具合事例の検索
 
 PGroongaでNormalizeのオプションA,Bを使うと期待した結果にならない。
@@ -78,18 +92,6 @@ PGroonga NormalizerNFKC130 A BでRedmineを検索
 ☓ PGroonga NormalizerNFKC130 A_bu_sounds B
 ○ PGroonga NormalizerNFKC130 A B
 ○ Groonga NormalizerNFKC130 A B(HITせず)
-
-= 適合率と再現率
-
-  # image
-  # src = images/precision-hight-recall-low.png
-  # relative_height = 90
-
-= 適合率と再現率
-
-  # image
-  # src = images/precision-low-recall-hight.png
-  # relative_height = 90
 
 = 再現率の注意点
 
