@@ -154,7 +154,7 @@ Web検索のような検索対象が膨大な場合は
     INSERT INTO normalizer_test VALUES (5, 'kiroguramu');
     INSERT INTO normalizer_test VALUES (6, 'ｋｉｒｏｇｕｒａｍｕ');
 
-    SELECT * FROM normalizer_test WHERE content &@ 'キログラム';
+    SELECT * FROM normalizer_test WHERE content &@ 'kiroguramu';
 
 = PGroongaのノーマライザー\n(デフォルト)
 
@@ -163,14 +163,12 @@ Web検索のような検索対象が膨大な場合は
 
   id | content
 
-  1 | キログラム
-  3 | ㌕
-  4 | ｷﾛｸﾞﾗﾑ
+  5 | kiroguramu
+  6 | ｋｉｒｏｇｕｒａｍｕ
 
 = PGroongaのノーマライザー\n(デフォルト)
 
 * 半角/全角を同一視
-* ㌕とキログラムを同一視
 
 = PGroongaのノーマライザー\n(デフォルト)
 
@@ -190,7 +188,7 @@ PGroongaのデフォルトはNFKCを使った正規化\n
             ON normalizer_test
          USING pgroonga (content)
           WITH (normalizers='NormalizerNFKC130("unify_to_romaji", true)');
-  SELECT * FROM normalizer_test WHERE content &@ 'キログラム';
+  SELECT * FROM normalizer_test WHERE content &@ 'kiroguramu';
 
 = PGroongaのノーマライザー\n(NormalizerNFKC130)
 
@@ -216,7 +214,7 @@ PGroongaのデフォルトはNFKCを使った正規化\n
 
 = PGroongaのノーマライザー\n(NormalizerNFKC130)
 
-* Unify_to_romaji
+* unify_to_romaji
 
   * ローマ字に正規化\nローマ字で読んだときに同じ語は同一視する
   * (e.g. 「kiroguramu」と「きろぐらむ」を同一視。ローマ字読みが同じだから)
@@ -236,6 +234,16 @@ PGroongaのデフォルトはNFKCを使った正規化\n
 
 * NormalizerNFKC130の\nオプション一覧
   * ((<URL:https://groonga.org/ja/docs/reference/normalizers/normalizer_nfkc130.html#syntax>))
+
+NFKC51,100,121,130の違い
+
+= 高度な内容
+
+オプションの適合順序
+
+= PGroongaのトークナイザー\n(デフォルト)
+
+トークナイザーの説明
 
 = PGroongaのトークナイザー\n(デフォルト)
 
@@ -299,6 +307,10 @@ PGroongaのデフォルトはNFKCを使った正規化\n
   京都府 2日目 嵐山
   京都府 3日目 天橋立
 
+= PGroongaのトークナイザー\n(TokenMecab)
+
+TokenMecabを使ってうまくいく理由
+
 = トークナイザーの指定方法
 
 * tokenizer='トークナイザー名'
@@ -307,6 +319,9 @@ PGroongaのデフォルトはNFKCを使った正規化\n
 
 * 使用可能なトークナイザー
   * ((<URL:https://groonga.org/ja/docs/reference/tokenizers.html>))
+
+TokenRegexpとTokenPatternの使い和わけ
+TokenTableの使い方
 
 = ステミング(語幹処理)
 
@@ -384,6 +399,41 @@ PGroongaのデフォルトはNFKCを使った正規化\n
   I developed Groonga
 
 = ステミングの使用方法
+
+= 高度な話題
+
+処理順序
+
+(1) ノーマライズ
+(2) トークナイズ
+(3) トークンフィルター
+
+= 高度な話題
+
+例)
+
+= 高度な話題
+
+トークナイズ後にノーマライズしたい場合
+
+= 高度な話題
+
+トークンフィルターでノーマライズ
+
+= 高度な話題
+
+処理順序
+
+(1) ノーマライズ
+(2) トークナイズ
+(3) ((*トークンフィルター*))
+
+= 高度な話題
+
+TokenFilterNFKC100を使う
+
+* 動作は、NormalizerNFKC130と同じ
+* オプションも同じ
 
 = 同義語
 
@@ -489,41 +539,9 @@ typo対策
 
 = 曖昧検索の使い方
 
-
 = 高度な話題
 
-処理順序
-
-(1) ノーマライズ
-(2) トークナイズ
-(3) トークンフィルター
-
-= 高度な話題
-
-例)
-
-= 高度な話題
-
-トークナイズ後にノーマライズしたい場合
-
-= 高度な話題
-
-トークンフィルターでノーマライズ
-
-= 高度な話題
-
-処理順序
-
-(1) ノーマライズ
-(2) トークナイズ
-(3) ((*トークンフィルター*))
-
-= 高度な話題
-
-TokenFilterNFKC100を使う
-
-* 動作は、NormalizerNFKC130と同じ
-* オプションも同じ
+編集距離
 
 = PGroongaでランキング改善
 
