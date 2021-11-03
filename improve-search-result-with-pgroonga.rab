@@ -175,6 +175,9 @@ Web検索のような検索対象が膨大な場合は
 PGroongaのデフォルトはNFKCを使った正規化\n
 ※対象のテキストのエンコードがUTF-8の時
 
+EUC-JP、SHIFT-JISでも正規化する。
+EUC-JP、SHIFT-JISの正規化例も出す。
+
 = ノーマライザーの変更
 
 再現率を上げたい
@@ -236,6 +239,11 @@ PGroongaのデフォルトはNFKCを使った正規化\n
   * ((<URL:https://groonga.org/ja/docs/reference/normalizers/normalizer_nfkc130.html#syntax>))
 
 NFKC51,100,121,130の違い
+
+= PostgreSQLのノーマライザー
+
+PostgreSQL13で追加されたnormalize関数
+でも同じことができる。(UTF-8)
 
 = 高度な内容
 
