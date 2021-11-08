@@ -29,38 +29,28 @@
 
 = 目次
 
-(1) 検索の評価指標
+(1) 検索結果の評価指標
 (2) PGrooongaで検索結果の改善
 
-= 検索の評価指標
+= 検索結果の評価指標
 
 よく検索結果が\n
 ((*いまいち*))だ...\n
 という話を\n聞きます
 
-= 検索の評価指標
+= 検索結果の評価指標
 
   # image
   # src = images/search-result-01.png
   # relative_height = 100
 
-= 検索の評価指標
+= いまいちな検索結果
 
 * 😞検索漏れ
 * 😞ノイズが多い
 * 😞有用な情報を探し出せない
 
-= 検索の評価指標
-
-検索の評価指標は\n
-2種類
-
-= 検索の評価指標
-
-(1) 効率性\n低コストで検索できるかどうか
-(2) ((*有効性*))\n検索結果の全体 or 一部が\n((*欲しい情報*))だったかどうか
-
-= 基本的な有効性の指標
+= 検索結果の評価指標
 
 (1) 適合率
 (2) 再現率
@@ -68,47 +58,66 @@
 
 = 適合率
 
-  # LaTeX
-  # relative_width = 10
-
-  $${ユーザーが欲しいドキュメント}/{検索にヒットしたドキュメント}$$
+  # image
+  # src = images/precision-expression.png
+  # relative_height = 60
 
 = 再現率
 
-  # LaTeX
-  # relative_width = 10
-
-  $${検索にヒットしたドキュメント}/{ユーザーが欲しいドキュメント}$$
+  # image
+  # src = images/recall-expression.png
+  # relative_height = 60
 
 = 適合率と再現率
 
-例) 過去の不具合事例の検索
+具体例
 
-PGroongaでNormalizeのオプションA,Bを使うと期待した結果にならない。
+= 適合率と再現率
 
-PGroonga NormalizerNFKC130 A BでRedmineを検索
+Wikipediaで\n"キログラムの定義"を調べる
 
-☓ PGroonga NormalizerNFKC130 A_v_sounds B
-☓ PGroonga NormalizerNFKC130 A_bu_sounds B
-○ PGroonga NormalizerNFKC130 A B
-○ Groonga NormalizerNFKC130 A B(HITせず)
+= 適合率と再現率
 
-= 再現率の注意点
+  # coderay sql
 
-Web検索のような検索対象が膨大な場合は
-再現率という指標はあまり意味がない。
+  SELECT title FROM wikipedia where text &@~ 'キログラム 定義';
+                           title                          
+  --------------------------------------------------------
+   水
+   力
+   国際単位系
+    .
+    .
+    .
+  キログラム
+    .
+    .
+    .
+  (229 rows)
 
-関連する情報がどのくらいヒットしているかには
-興味がない。
+= 適合率と再現率
 
-こういう場合は適合率が重要。
+適合率\n
+1/229=0.43%
 
-一方で、検索漏れがあっては困る領域では重要。
-例えば、特許の検索であったり、裁判の判例の検索であったり。
+= 適合率と再現率
+
+再現率\n
+1/1=100%
+
+= 適合率と再現率の重要度
+
+Web検索\n
+適合率 > 再現率
+
+= 適合率と再現率の重要度
+
+特許検索\n
+適合率 < 再現率
 
 = ランキング
 
-欲しい情報が\nランキング((*上位*))にあるか
+検索結果の順序
 
 = ランキング
 
@@ -130,90 +139,101 @@ Web検索のような検索対象が膨大な場合は
 
   * スコアラーを使う
 
-= PGroongaのノーマライザー\n(デフォルト)
+= ノーマライズ
 
-ノーマライザー\n
-(同一視)
+ノーマライズ\n(正規化)とは？
+
+= ノーマライズ
+
+例) カタカナをひらがなに正規化
+
+* きろぐらむ -> きろぐらむ
+* キログラム -> きろぐらむ
 
 = PGroongaのノーマライザー\n(デフォルト)
 
   # coderay sql
 
-    CREATE DATABASE pgroonga_test;
-    CREATE EXTENSION pgroonga;
-    CREATE TABLE normalizer_test (
-      id integer,
-      content text
-    );
-    CREATE INDEX pgroonga_content_index ON normalizer_test USING pgroonga (content);
+  CREATE TABLE normalizer_test (
+    id integer,
+    content text
+  );
 
-    INSERT INTO normalizer_test VALUES (1, 'キログラム');
-    INSERT INTO normalizer_test VALUES (2, 'きろぐらむ');
-    INSERT INTO normalizer_test VALUES (3, '㌕');
-    INSERT INTO normalizer_test VALUES (4, 'ｷﾛｸﾞﾗﾑ');
-    INSERT INTO normalizer_test VALUES (5, 'kiroguramu');
-    INSERT INTO normalizer_test VALUES (6, 'ｋｉｒｏｇｕｒａｍｕ');
+  CREATE INDEX pgroonga_content_index ON normalizer_test USING pgroonga (content);
 
-    SELECT * FROM normalizer_test WHERE content &@ 'kiroguramu';
+  INSERT INTO normalizer_test VALUES (1, 'キログラム');
+  INSERT INTO normalizer_test VALUES (2, 'きろぐらむ');
+  INSERT INTO normalizer_test VALUES (3, '㌕');
+  INSERT INTO normalizer_test VALUES (4, 'ｷﾛｸﾞﾗﾑ');
+  INSERT INTO normalizer_test VALUES (5, 'kiroguramu');
+  INSERT INTO normalizer_test VALUES (6, 'ｋｉｒｏｇｕｒａｍｕ');
 
-= PGroongaのノーマライザー\n(デフォルト)
-
-  # RT
-  delimiter = [|]
-
-  id | content
-
-  5 | kiroguramu
-  6 | ｋｉｒｏｇｕｒａｍｕ
+  SELECT * FROM normalizer_test WHERE content &@ 'kiroguramu';
 
 = PGroongaのノーマライザー\n(デフォルト)
 
-* 半角/全角を同一視
+  # coderay sql
+
+  SELECT * FROM normalizer_test WHERE content &@ 'kiroguramu';
+   id |       content        
+  ----+----------------------
+    5 | kiroguramu
+    6 | ｋｉｒｏｇｕｒａｍｕ
+  (2 rows)
 
 = PGroongaのノーマライザー\n(デフォルト)
 
-PGroongaのデフォルトはNFKCを使った正規化\n
-※対象のテキストのエンコードがUTF-8の時
+* ｋｉｒｏｇｕｒａｍｕ
+↓
+* kiroguramu
 
-EUC-JP、SHIFT-JISでも正規化する。
-EUC-JP、SHIFT-JISの正規化例も出す。
+= PGroongaのノーマライザー\n(デフォルト)
+
+* NFKCを使った正規化
+  * テキストエンコードがUTF-8の場合
+
+= PostgreSQLのノーマライザー\n(デフォルト)
+
+  # coderay sql
+
+  SELECT * FROM normalizer_test
+    WHERE content = (SELECT normalize('ｋｉｒｏｇｕｒａｍｕ', NFKC));
+   id |  content   
+  ----+------------
+    5 | kiroguramu
+  (1 row)
 
 = ノーマライザーの変更
 
-再現率を上げたい
+適合率/再現率を上げたい
 
 = PGroongaのノーマライザー\n(NormalizerNFKC130)
 
   # coderay sql
 
-    DROP INDEX pgroonga_content_index;
+  DROP INDEX pgroonga_content_index;
+
   CREATE INDEX pgroonga_content_index
             ON normalizer_test
          USING pgroonga (content)
           WITH (normalizers='NormalizerNFKC130("unify_to_romaji", true)');
+
   SELECT * FROM normalizer_test WHERE content &@ 'kiroguramu';
 
 = PGroongaのノーマライザー\n(NormalizerNFKC130)
 
-  # RT
-  delimiter = [|]
+  # coderay sql
 
-  id | content
-
-  1 | キログラム
-  2 | きろぐらむ
-  3 | ㌕
-  4 | ｷﾛｸﾞﾗﾑ
-
-= PGroongaのノーマライザー\n(NormalizerNFKC130)
-
-  # RT
-  delimiter = [|]
-
-  id | content
-
-  5 | kiroguramu
-  6 | ｋｉｒｏｇｕｒａｍｕ
+  SELECT * FROM normalizer_test WHERE content &@ 'kiroguramu';
+   id |       content        
+  ----+----------------------
+    1 | キログラム
+    2 | きろぐらむ
+    3 | ㌕
+    4 | ｷﾛｸﾞﾗﾑ
+    5 | kiroguramu
+    6 | ｋｉｒｏｇｕｒａｍｕ
+  (6 rows)
 
 = PGroongaのノーマライザー\n(NormalizerNFKC130)
 
@@ -237,17 +257,6 @@ EUC-JP、SHIFT-JISの正規化例も出す。
 
 * NormalizerNFKC130の\nオプション一覧
   * ((<URL:https://groonga.org/ja/docs/reference/normalizers/normalizer_nfkc130.html#syntax>))
-
-NFKC51,100,121,130の違い
-
-= PostgreSQLのノーマライザー
-
-PostgreSQL13で追加されたnormalize関数
-でも同じことができる。(UTF-8)
-
-= 高度な内容
-
-オプションの適合順序
 
 = PGroongaのトークナイザー\n(デフォルト)
 
@@ -340,7 +349,7 @@ TokenTableの使い方
 例えば
 
 * develop(原形)
-* developped(過去形)
+* developed(過去形)
 * developing(進行形)
 
 意味は同じだが語形は異なる
@@ -353,7 +362,7 @@ TokenTableの使い方
 
 (('tag:left'))
 ((*develop*))\n
-((*develop*))ped\n
+((*develop*))ed\n
 ((*develop*))ing
 
 = ステミング(語幹処理)
