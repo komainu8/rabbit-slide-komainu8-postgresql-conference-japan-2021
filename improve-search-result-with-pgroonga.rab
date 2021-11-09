@@ -145,6 +145,12 @@ Web検索\n
 
 = ノーマライズ
 
+  # image
+  # src = images/normalizer.png
+  # relative_height = 90
+
+= ノーマライズ
+
 例) カタカナをひらがなに正規化
 
 * きろぐらむ -> きろぐらむ
@@ -244,58 +250,69 @@ Web検索\n
 
 = オプションの指定方法
 
-* 'NormalizerNFKC130\n("オプション名", true)');
+  # coderay sql
+
+  CREATE INDEX pgroonga_content_index
+            ON normalizer_test
+         USING pgroonga (content)
+          WITH (normalizers='NormalizerNFKC130("unify_to_romaji", true)');
 
 = 複数オプションの指定方法
 
-'NormalizerNFKC130(\n
-"オプション名", true,\n
-"オプション名", true,\n
-...)');
+  # coderay sql
+
+  CREATE INDEX pgroonga_content_index
+            ON normalizer_test
+         USING pgroonga (content)
+          WITH (normalizers='NormalizerNFKC130("unify_to_romaji", true,
+                                               "unify_hyphen", true)');
 
 = 指定可能オプション一覧
 
 * NormalizerNFKC130の\nオプション一覧
   * ((<URL:https://groonga.org/ja/docs/reference/normalizers/normalizer_nfkc130.html#syntax>))
 
-= PGroongaのトークナイザー\n(デフォルト)
+= トークナイズ
 
-トークナイザーの説明
+  # image
+  # src = images/tokenizer.png
+  # relative_height = 80
 
 = PGroongaのトークナイザー\n(デフォルト)
 
   # coderay sql
 
-    CREATE TABLE tokenizer_test (
-      title text
-    );
-    CREATE INDEX pgroonga_content_index ON tokenizer_test USING pgroonga (title);
+  CREATE TABLE tokenizer_test (
+    title text
+  );
+  CREATE INDEX pgroonga_content_index ON tokenizer_test USING pgroonga (title);
 
-    INSERT INTO tokenizer_test VALUES ('京都府 1日目 金閣寺');
-    INSERT INTO tokenizer_test VALUES ('京都府 2日目 嵐山');
-    INSERT INTO tokenizer_test VALUES ('京都府 3日目 天橋立');
-    INSERT INTO tokenizer_test VALUES ('東京都 1日目 スカイツリー');
-    INSERT INTO tokenizer_test VALUES ('東京都 2日目 浅草寺');
-    INSERT INTO tokenizer_test VALUES ('北海道 1日目 函館');
-    INSERT INTO tokenizer_test VALUES ('北海道 2日目 トマム');
-    INSERT INTO tokenizer_test VALUES ('北海道 3日目 富良野');
-    INSERT INTO tokenizer_test VALUES ('北海道 4日目 美瑛');
-    INSERT INTO tokenizer_test VALUES ('北海道 5日目 旭川');
+  INSERT INTO tokenizer_test VALUES ('京都府 1日目 金閣寺');
+  INSERT INTO tokenizer_test VALUES ('京都府 2日目 嵐山');
+  INSERT INTO tokenizer_test VALUES ('京都府 3日目 天橋立');
+  INSERT INTO tokenizer_test VALUES ('東京都 1日目 スカイツリー');
+  INSERT INTO tokenizer_test VALUES ('東京都 2日目 浅草寺');
+  INSERT INTO tokenizer_test VALUES ('北海道 1日目 函館');
+  INSERT INTO tokenizer_test VALUES ('北海道 2日目 トマム');
+  INSERT INTO tokenizer_test VALUES ('北海道 3日目 富良野');
+  INSERT INTO tokenizer_test VALUES ('北海道 4日目 美瑛');
+  INSERT INTO tokenizer_test VALUES ('北海道 5日目 旭川');
 
-    SELECT * FROM tokenizer_test WHERE title &@ '京都';
+  SELECT * FROM tokenizer_test WHERE title &@~ '京都';
 
 = PGroongaのトークナイザー\n(デフォルト)
 
-  # RT
-  delimiter = [|]
+  # coderay sql
 
-  title
-
-  京都府 1日目 金閣寺
-  京都府 2日目 嵐山
-  京都府 3日目 天橋立
-  東京都 1日目 スカイツリー
-  東京都 2日目 浅草寺
+  SELECT * FROM tokenizer_test WHERE title &@~ '京都';
+                  title                 
+  --------------------------------------
+   京都府 1日目 金閣寺
+   京都府 2日目 嵐山
+   京都府 3日目 天橋立
+   東京都 1日目 スカイツリー
+   東京都 2日目 浅草寺
+  (5 rows)
 
 = トークナイザーの変更
 
@@ -305,44 +322,48 @@ Web検索\n
 
   # coderay sql
 
-    DROP INDEX pgroonga_content_index;
   CREATE INDEX pgroonga_content_index
             ON tokenizer_test
          USING pgroonga (title)
           WITH (tokenizer='TokenMecab');
 
-  SELECT * FROM tokenizer_test WHERE title &@ '京都';
+  SELECT * FROM tokenizer_test WHERE title &@~ '京都';
 
 = PGroongaのトークナイザー\n(TokenMecab)
 
-  # RT
-  delimiter = [|]
+  # coderay sql
 
-  title
-
-  京都府 1日目 金閣寺
-  京都府 2日目 嵐山
-  京都府 3日目 天橋立
+  SELECT * FROM tokenizer_test WHERE title &@~ '京都';
+                  title                 
+  --------------------------------------
+   京都府 1日目 金閣寺
+   京都府 2日目 嵐山
+   京都府 3日目 天橋立
+  (3 rows)
 
 = PGroongaのトークナイザー\n(TokenMecab)
 
-TokenMecabを使ってうまくいく理由
+  # image
+  # src = images/tokenizer-tokenmecab.png
+  # relative_height = 80
 
 = トークナイザーの指定方法
 
-* tokenizer='トークナイザー名'
+  # coderay sql
+
+  CREATE INDEX pgroonga_content_index
+            ON tokenizer_test
+         USING pgroonga (title)
+          WITH (tokenizer='TokenMecab');
 
 = 指定可能トークナイザー一覧
 
 * 使用可能なトークナイザー
   * ((<URL:https://groonga.org/ja/docs/reference/tokenizers.html>))
 
-TokenRegexpとTokenPatternの使い和わけ
-TokenTableの使い方
-
 = ステミング(語幹処理)
 
-語形変化\n意味は同じだが\n語の形が変わる
+意味は同じだが\n語の形が変わる\n(語形変化)
 
 = ステミング(語幹処理)
 
@@ -374,48 +395,57 @@ TokenTableの使い方
 
   # coderay sql
 
-    CREATE TABLE steming_test (
-      title text
-    );
-    CREATE INDEX pgroonga_content_index ON steming_test USING pgroonga (title);
+  CREATE TABLE steming_test (
+    title text
+  );
+  CREATE INDEX pgroonga_content_index ON steming_test USING pgroonga (title);
 
-    INSERT INTO tokenizer_test VALUES ('I develop Groonga');
-    INSERT INTO tokenizer_test VALUES ('I am developing Groonga');
-    INSERT INTO tokenizer_test VALUES ('I developed Groonga');
+  INSERT INTO steming_test VALUES ('I develop Groonga');
+  INSERT INTO steming_test VALUES ('I am developing Groonga');
+  INSERT INTO steming_test VALUES ('I developed Groonga');
 
-    SELECT * FROM tokenizer_test WHERE title &@ 'develop';
+  SELECT * FROM steming_test WHERE title &@~ 'develop';
 
 = PGroongaのステミング\n(未使用)
 
-  # RT
-  delimiter = [|]
+  # coderay sql
 
-  title
-
-  I develop Groonga
+  SELECT * FROM steming_test WHERE title &@~ 'develop';
+         title       
+  -------------------
+   I develop Groonga
+  (1 row)
 
 = PGroongaのステミング
 
   # coderay sql
 
-    CREATE INDEX pgroonga_content_index
-              ON steming_test
-           USING pgroonga (title)
-            WITH (plugins='token_filters/stem',
-                  token_filters='TokenFilterStem');
+  CREATE TABLE steming_test (
+    title text
+  );
+  CREATE INDEX pgroonga_content_index
+            ON steming_test
+         USING pgroonga (title)
+          WITH (plugins='token_filters/stem',
+                token_filters='TokenFilterStem');
+
+  INSERT INTO steming_test VALUES ('I develop Groonga');
+  INSERT INTO steming_test VALUES ('I am developing Groonga');
+  INSERT INTO steming_test VALUES ('I developed Groonga');
+
+  SELECT * FROM steming_test WHERE title &@~ 'develop';
 
 = PGroongaのステミング
 
-  # RT
-  delimiter = [|]
+  # coderay sql
 
-  title
-
-  I develop Groonga
-  I am developing Groonga
-  I developed Groonga
-
-= ステミングの使用方法
+  SELECT * FROM steming_test WHERE title &@~ 'develop';
+            title          
+  -------------------------
+   I develop Groonga
+   I am developing Groonga
+   I developed Groonga
+  (3 rows)
 
 = 高度な話題
 
@@ -427,15 +457,20 @@ TokenTableの使い方
 
 = 高度な話題
 
-例)
+処理順序が問題になることがある
 
 = 高度な話題
 
-トークナイズ後にノーマライズしたい場合
+TokenMecab と unify_kana
 
 = 高度な話題
 
-トークンフィルターでノーマライズ
+* 「ワールドカップ」->\n「わーるどかっぷ」
+
+= 高度な話題
+
+* 「ワールドカップ」 ->\n「ワールドカップ」
+* 「わーるどかっぷ」 ->\n「わ/ー/る/ど/かっぷ」
 
 = 高度な話題
 
@@ -449,8 +484,11 @@ TokenTableの使い方
 
 TokenFilterNFKC100を使う
 
-* 動作は、NormalizerNFKC130と同じ
-* オプションも同じ
+= 高度な話題
+
+* TokenFilterNFKC100
+  * 働きは、NormalizerNFKC100と同じ
+  * トークナイズ後にノーマライズしたいときに使う
 
 = 同義語
 
@@ -474,49 +512,47 @@ TokenFilterNFKC100を使う
 
   # coderay sql
 
-    CREATE TABLE synonyms (
-      term text PRIMARY KEY,
-      synonyms text[]
-    );
+  CREATE TABLE synonyms (
+    term text PRIMARY KEY,
+    synonyms text[]
+  );
 
-    CREATE INDEX synonyms_search ON synonyms USING pgroonga (term pgroonga.text_term_search_ops_v2);
+  CREATE INDEX synonyms_search ON synonyms USING pgroonga (term pgroonga.text_term_search_ops_v2);
 
-    INSERT INTO synonyms (term, synonyms) VALUES ('ミルク', ARRAY['ミルク', '牛乳']);
-    INSERT INTO synonyms (term, synonyms) VALUES ('牛乳', ARRAY['牛乳', 'ミルク']);
+  INSERT INTO synonyms (term, synonyms) VALUES ('ミルク', ARRAY['ミルク', '牛乳']);
+  INSERT INTO synonyms (term, synonyms) VALUES ('牛乳', ARRAY['牛乳', 'ミルク']);
 
-    CREATE TABLE memos (
-      id integer,
-      content text
-    );
+  CREATE TABLE memos (
+    id integer,
+    content text
+  );
 
-    INSERT INTO memos VALUES (1, '牛乳石鹸');
-    INSERT INTO memos VALUES (2, 'ミルクジャム');
-    INSERT INTO memos VALUES (3, 'ストロベリー');
+  INSERT INTO memos VALUES (1, '牛乳石鹸');
+  INSERT INTO memos VALUES (2, 'ミルクジャム');
+  INSERT INTO memos VALUES (3, 'ストロベリー');
 
-    CREATE INDEX pgroonga_content_index ON memos USING pgroonga (content);
+  CREATE INDEX pgroonga_content_index ON memos USING pgroonga (content);
 
-    SELECT * FROM memos
-      WHERE
-        content &@~
-          pgroonga_query_expand('synonyms', 'term', 'synonyms', '牛乳');
+  SELECT * FROM memos
+    WHERE
+      content &@~
+        pgroonga_query_expand('synonyms', 'term', 'synonyms', '牛乳');
 
 = 同義語展開
 
-  # RT
-  delimiter = [|]
+  # coderay sql
 
-  id | content
-
-  1 | 牛乳石鹸
-  2 | ミルクジャム
-
-= 同義語展開の使い方
+   id |      content       
+  ----+--------------------
+    1 | 牛乳石鹸
+    2 | ミルクジャム
+  (2 rows)
 
 = 曖昧検索
 
 typo対策
 
-= 曖昧検索
+= fuzzy検索
 
 * 似たような語ならヒットする
 (完全一致じゃなくてもヒットする)
@@ -530,43 +566,39 @@ typo対策
 
   # coderay sql
 
-    CREATE TABLE tags (
-      name text
-    );
+  CREATE TABLE tags (
+    name text
+  );
 
-    CREATE INDEX tags_search ON tags USING pgroonga(name) WITH (tokenizer='');
-    INSERT INTO tags VALUES ('テクノロジー');
-    INSERT INTO tags VALUES ('テクニカル');
+  CREATE INDEX tags_search ON tags USING pgroonga(name) WITH (tokenizer='');
+  INSERT INTO tags VALUES ('テクノロジー');
+  INSERT INTO tags VALUES ('テクニカル');
 
-    SELECT name FROM tags
-      WHERE
-        name &`
-          ('fuzzy_search(name, ' || pgroonga_escape('テノクロジー') || ',
-                         {"with_transposition": true,
-                          "max_distance": 1})');
+  SELECT name FROM tags
+    WHERE
+      name &`
+        ('fuzzy_search(name, ' || pgroonga_escape('テノクロジー') || ',
+                       {"with_transposition": true,
+                        "max_distance": 1})');
 
 = 曖昧検索
 
-  # RT
-  delimiter = [|]
+  # coderay sql
 
-  name
-
-  テクノロジー
-
-= 曖昧検索の使い方
-
-= 高度な話題
-
-編集距離
+  SELECT name FROM tags
+    WHERE
+      name &`
+        ('fuzzy_search(name, ' || pgroonga_escape('テノクロジー') || ',
+                       {"with_transposition": true,
+                        "max_distance": 1})');
+          name        
+  --------------------
+   テクノロジー
+  (1 row)
 
 = PGroongaでランキング改善
 
 何を基準に\nランキングを\n決めるのか
-
-= PGroongaのスコアー
-
-スコアー
 
 = PGroongaのスコアリング
 
@@ -616,6 +648,8 @@ typo対策
         'pgroonga_memos_index')::pgroonga_full_text_search_condition_with_scorers
      ORDER BY score DESC;
 
+  SELECT title, pgroonga_score(tableoid, ctid) FROM wikipedia where text &@~ 'キログラム 定義';
+
 = PGroongaのスコアリング\nTF-IDF
 
 (要確認)
@@ -656,5 +690,3 @@ typo対策
 
 * 使用可能なスコアラー一覧
   * ((<URL:https://groonga.org/ja/docs/reference/scorer.html#built-in-scorers>))
-
-
