@@ -98,12 +98,19 @@ Wikipediaで\n"キログラムの定義"を調べる
 = 適合率と再現率
 
 適合率\n
-1/229=0.43%
+2/229=0.87%
+
+= 適合率と再現率
+
+*ヒットしなかったけど\n欲しかった記事
+
+  * SI基本単位の再定義
+  * 国際キログラム原器
 
 = 適合率と再現率
 
 再現率\n
-1/1=100%
+1/3=33.3%
 
 = 適合率と再現率の重要度
 
@@ -548,7 +555,7 @@ TokenFilterNFKC100を使う
     2 | ミルクジャム
   (2 rows)
 
-= 曖昧検索
+= fuzzy検索
 
 typo対策
 
@@ -557,7 +564,7 @@ typo対策
 * 似たような語ならヒットする
 (完全一致じゃなくてもヒットする)
 
-= 曖昧検索
+= fuzzy検索
 
 「テノクロジー」で\n
 「テクノロジー」がヒット
@@ -581,7 +588,7 @@ typo対策
                        {"with_transposition": true,
                         "max_distance": 1})');
 
-= 曖昧検索
+= fuzzy検索
 
   # coderay sql
 
@@ -602,8 +609,9 @@ typo対策
 
 = PGroongaのスコアリング
 
-* TF(PGroongaのデフォルト)
+* TF(デフォルト)
 * TF-IDF
+* TF at Most
 
 = PGroongaのスコアリング\nTF(デフォルト)
 
@@ -612,6 +620,41 @@ typo対策
 = PGroongaのスコアリング\nTF(デフォルト)
 
 * 検索キーワードが文書内に多く含まれる文書のスコアーが高くなる
+
+= PGroongaのスコアリング\nTF(デフォルト)
+
+  # coderay sql
+
+  CREATE TABLE memos (
+    title text,
+    content text
+  );
+
+  CREATE INDEX pgroonga_memos_index
+      ON memos
+   USING pgroonga (content);
+  INSERT INTO memos VALUES ('PostgreSQL', 'PostgreSQLはリレーショナル・データベース管理システムです。');
+  INSERT INTO memos VALUES ('Groonga', 'Groongaは日本語対応の高速な全文検索エンジンです。');
+  INSERT INTO memos VALUES ('PGroonga', 'PGroongaはインデックスとしてGroongaを使うためのPostgreSQLの拡張機能です。');
+  INSERT INTO memos VALUES ('PGroonga1', 'PGroongaは全文検索エンジンGroongaを使っています。');
+  INSERT INTO memos VALUES ('PGroonga2', 'Groonga、Groonga、Groonga、Groonga、Groonga');
+
+= PGroongaのスコアリング\nTF(デフォルト)
+
+  # coderay sql
+
+  SELECT *, pgroonga_score(tableoid, ctid) AS score
+    FROM memos
+   WHERE content &@~ 'Groonga'
+   ORDER BY score DESC;
+
+     title   |                                  content                                  | score 
+  -----------+---------------------------------------------------------------------------+-------
+   PGroonga2 | Groonga、Groonga、Groonga、Groonga、Groonga                               |     5
+   Groonga   | Groongaは日本語対応の高速な全文検索エンジンです。                         |     1
+   PGroonga  | PGroongaはインデックスとしてGroongaを使うためのPostgreSQLの拡張機能です。 |     1
+   PGroonga1 | PGroongaは全文検索エンジンGroongaを使っています。                         |     1
+  (4 rows)
 
 = PGroongaのスコアリング\nTF-IDF
 
@@ -626,41 +669,65 @@ typo対策
 
   # coderay sql
 
-    CREATE TABLE memos (
-      title text,
-      content text
-    );
+  SELECT *, pgroonga_score(tableoid, ctid) AS score
+    FROM memos
+   WHERE content &@~
+     ('Groonga OR 全文検索',
+      ARRAY[1],
+      ARRAY['scorer_tf_idf($index)'],
+      'pgroonga_memos_index')::pgroonga_full_text_search_condition_with_scorers
+   ORDER BY score DESC;
 
-    CREATE INDEX pgroonga_memos_index
-        ON memos
-     USING pgroonga (content);
-    INSERT INTO memos VALUES ('PostgreSQL', 'PostgreSQLはリレーショナル・データベース管理システムです。');
-    INSERT INTO memos VALUES ('Groonga', 'Groongaは日本語対応の高速な全文検索エンジンです。');
-    INSERT INTO memos VALUES ('PGroonga', 'PGroongaはインデックスとしてGroongaを使うためのPostgreSQLの拡張機能です。');
-    INSERT INTO memos VALUES ('コマンドライン', 'groongaコマンドがあります。');
+     title   |                                  content                                  | score 
+  -----------+---------------------------------------------------------------------------+-------
+   Groonga   | Groongaは日本語対応の高速な全文検索エンジンです。                         |     2
+   PGroonga1 | PGroongaは全文検索エンジンGroongaを使っています。                         |     2
+   PGroonga  | PGroongaはインデックスとしてGroongaを使うためのPostgreSQLの拡張機能です。 |     1
+   PGroonga2 | Groonga、Groonga、Groonga、Groonga、Groonga                               |     1
+  (4 rows)
 
-    SELECT *, pgroonga_score(tableoid, ctid) AS score
-      FROM memos
-     WHERE content &@~
-       ('PostgreSQL OR 検索',
-        ARRAY[1],
-        ARRAY['scorer_tf_idf($index)'],
-        'pgroonga_memos_index')::pgroonga_full_text_search_condition_with_scorers
-     ORDER BY score DESC;
+= PGroongaのスコアリング\nTF at Most
 
-  SELECT title, pgroonga_score(tableoid, ctid) FROM wikipedia where text &@~ 'キログラム 定義';
+スコアーの\n((*最大値*))を制限
 
-= PGroongaのスコアリング\nTF-IDF
+= PGroongaのスコアリング\nTF at Most
 
-(要確認)
-  # RT
-  delimiter = [|]
+  # coderay sql
 
-  title | score
+  SELECT *, pgroonga_score(tableoid, ctid) AS score
+    FROM memos
+  WHERE content &@~ 'Groonga OR PostgreSQL'
+  ORDER BY score DESC;
 
-  PGroonga    | 1.3862943649291992
-  PostgreSQL | 1
-  Groonga   | 1
+     title    |                                  content                                  | score 
+  ------------+---------------------------------------------------------------------------+-------
+   PGroonga2  | Groonga、Groonga、Groonga、Groonga、Groonga                               |     5
+   PGroonga   | PGroongaはインデックスとしてGroongaを使うためのPostgreSQLの拡張機能です。 |     2
+   Groonga    | Groongaは日本語対応の高速な全文検索エンジンです。                         |     1
+   PGroonga1  | PGroongaは全文検索エンジンGroongaを使っています。                         |     1
+   PostgreSQL | PostgreSQLはリレーショナル・データベース管理システムです。                |     1
+  (5 rows)
+
+= PGroongaのスコアリング\nTF at Most
+
+  # coderay sql
+
+  SELECT *, pgroonga_score(tableoid, ctid) AS score
+    FROM memos
+   WHERE content &@~
+     ('Groonga OR 全文検索',
+      ARRAY[1],
+      ARRAY['scorer_tf_at_most($index, 1)'],
+      'pgroonga_memos_index')::pgroonga_full_text_search_condition_with_scorers
+   ORDER BY score DESC;
+
+     title   |                                  content                                  | score 
+  -----------+---------------------------------------------------------------------------+-------
+   Groonga   | Groongaは日本語対応の高速な全文検索エンジンです。                         |     2
+   PGroonga1 | PGroongaは全文検索エンジンGroongaを使っています。                         |     2
+   PGroonga  | PGroongaはインデックスとしてGroongaを使うためのPostgreSQLの拡張機能です。 |     1
+   PGroonga2 | Groonga、Groonga、Groonga、Groonga、Groonga                               |     1
+  (4 rows)
 
 = 参考資料
 
@@ -678,7 +745,13 @@ typo対策
 
 * 使用可能なトークナイザー一覧
 
-　* ((<URL:https://groonga.org/ja/docs/reference/tokenizers.html>))
+  * ((<URL:https://groonga.org/ja/docs/reference/tokenizers.html>))
+
+= 参考資料
+
+* ステミングの使用方法
+
+  * ((<URL:https://pgroonga.github.io/ja/reference/create-index-using-pgroonga.html>))
 
 = 参考資料
 
@@ -689,4 +762,12 @@ typo対策
 = 参考資料
 
 * 使用可能なスコアラー一覧
+
   * ((<URL:https://groonga.org/ja/docs/reference/scorer.html#built-in-scorers>))
+
+= 参考資料
+
+* スコアラーの設定方法
+
+  * ((<URL:https://pgroonga.github.io/ja/reference/operators/query-v2.html>))
+
