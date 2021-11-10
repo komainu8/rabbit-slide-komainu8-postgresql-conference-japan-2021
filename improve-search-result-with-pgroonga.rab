@@ -110,7 +110,7 @@ Wikipediaで\n"キログラムの定義"を調べる
 = 適合率と再現率
 
 再現率\n
-1/3=33.3%
+2/4=50.0%
 
 = 適合率と再現率の重要度
 
@@ -548,6 +548,11 @@ TokenFilterNFKC100を使う
 = 同義語展開
 
   # coderay sql
+
+  SELECT * FROM memos
+    WHERE
+      content &@~
+        pgroonga_query_expand('synonyms', 'term', 'synonyms', '牛乳');
 
    id |      content       
   ----+--------------------
