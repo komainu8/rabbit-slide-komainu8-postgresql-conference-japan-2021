@@ -283,7 +283,7 @@ Web検索\n
 
   # image
   # src = images/tokenizer.png
-  # relative_height = 80
+  # relative_height = 100
 
 = PGroongaのトークナイザー\n(デフォルト)
 
@@ -352,7 +352,7 @@ Web検索\n
 
   # image
   # src = images/tokenizer-tokenmecab.png
-  # relative_height = 80
+  # relative_height = 100
 
 = トークナイザーの指定方法
 
