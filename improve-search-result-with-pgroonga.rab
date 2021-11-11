@@ -60,7 +60,7 @@
 
   # image
   # src = images/precision-expression.png
-  # relative_height = 60
+  # relative_height = 55
 
 = 再現率
 
@@ -74,7 +74,7 @@
 
 = 適合率と再現率
 
-Wikipediaで\n"キログラムの定義"を調べる
+Wikipediaで\n"キログラムの\n定義"を調べる
 
 = 適合率と再現率
 
@@ -573,6 +573,25 @@ typo対策
 
 「テノクロジー」で\n
 「テクノロジー」がヒット
+
+= fuzzy検索\n編集距離
+
+* Aを何回操作するとBになるか
+* 操作とは？
+
+  * 文字の挿入・削除・置換・隣接文字交換
+
+* 操作回数を距離とする
+
+= fuzzy検索\n編集距離
+
+* A：テ((*ノク*))ロジー
+* 隣接文字交換：((*ク*))⇔((*ノ*))
+* B：テ((*クノ*))ロジー
+
+(('tag:center'))
+(('tag:x-large'))
+編集距離：1
 
 = PGroongaのfuzzy検索
 
