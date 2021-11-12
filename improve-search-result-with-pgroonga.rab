@@ -130,6 +130,12 @@ Web検索\n
 
 ユーザーは\n((*上位数件*))\nしか見ない
 
+= ランキングの指標(参考)
+
+* Precision@n
+* Map(Mean Average Precision)
+* nDCG(Normalizerd Discounted Cumulative Gain)
+
 = PGroongaで検索結果の改善
 
 * PGroongaで適合率/再現率改善
