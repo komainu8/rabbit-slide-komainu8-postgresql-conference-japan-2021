@@ -20,6 +20,18 @@ CC BY-SA 4.0
 
 原著作者：堀本泰弘
 
+=== Groonga・PGroonga・Mroonga・Rroongaのロゴ
+
+CC BY 3.0
+
+原著作者：Groongaプロジェクト
+
+=== クリアコードのロゴ
+
+CC BY-SA 4.0
+
+原著作者：株式会社クリアコード
+
 == 作者向け
 
 === 表示
